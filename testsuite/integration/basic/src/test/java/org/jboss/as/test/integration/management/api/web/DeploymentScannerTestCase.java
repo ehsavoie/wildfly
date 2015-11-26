@@ -21,6 +21,9 @@
  */
 package org.jboss.as.test.integration.management.api.web;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVICE_CONTAINER;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -41,7 +44,14 @@ import org.junit.runner.RunWith;
 
 import static org.jboss.as.test.integration.management.util.ModelUtil.createOpNode;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.jboss.as.test.integration.management.util.MgmtOperationException;
+import org.jboss.as.test.integration.management.util.SimpleServlet;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 
 /**
@@ -55,7 +65,7 @@ import static org.junit.Assert.assertTrue;
 public class DeploymentScannerTestCase extends ContainerResourceMgmtTestBase {
 
     private static final Logger logger = Logger.getLogger(DeploymentScannerTestCase.class);
-
+    private static final String DEPLOYMENT_NAME = "SimpleServlet.war";
     private static final String tempDir = System.getProperty("java.io.tmpdir");
     private static File deployDir;
 
@@ -82,7 +92,6 @@ public class DeploymentScannerTestCase extends ContainerResourceMgmtTestBase {
      */
     @Test
     public void testAddRemove() throws Exception {
-
         addDeploymentScanner();
         try {
             assertTestDeploymentScannerResourceExists();
@@ -142,16 +151,27 @@ public class DeploymentScannerTestCase extends ContainerResourceMgmtTestBase {
      */
     @Test
     public void testAddRemoveRollbacks() throws Exception {
-
+        prepareDeployment();
         // execute and rollback add deployment scanner
         final ModelNode addOp = getAddDeploymentScannerOp();
         final ModelNode resultOfRollback = executeAndRollbackOperation(addOp);
+        //TODO: poll the services to check that the deployment is off
         assertEquals("Unexpected result from invoking an operation which was supposed to fail", "failed", resultOfRollback.get("outcome").asString());
-
+        long timeout = 30000 + System.currentTimeMillis();
+        while (System.currentTimeMillis() < timeout && isDeploymentServicePresent(DEPLOYMENT_NAME)) {
+            Thread.sleep(100);
+        }
+        assertFalse(isDeploymentServicePresent(DEPLOYMENT_NAME));
+        
         // add deployment scanner - this time it's supposed to be added successfully
         addDeploymentScanner();
         try {
             assertTestDeploymentScannerResourceExists();
+            timeout = 30000 + System.currentTimeMillis();
+            while (System.currentTimeMillis() < timeout && !isDeploymentServicePresent(DEPLOYMENT_NAME)) {
+                Thread.sleep(100);
+            }
+            assertTrue(isDeploymentServicePresent(DEPLOYMENT_NAME));
             // execute and rollback remove deployment scanner
             final ModelNode removeOp = getRemoveDeploymentScannerOp();
             final ModelNode resultOfRemoveRollback = executeAndRollbackOperation(removeOp);
@@ -168,6 +188,14 @@ public class DeploymentScannerTestCase extends ContainerResourceMgmtTestBase {
                 logger.info("Removing test deployment scanner failed with exception", t);
             }
         }
+    }
+
+    private boolean isDeploymentServicePresent(String warName) throws IOException, MgmtOperationException {
+        final ModelNode op = Util.createEmptyOperation("dump-services", PathAddress.pathAddress(PathElement.pathElement(CORE_SERVICE, SERVICE_CONTAINER)));
+        final ModelNode result = executeOperation(op, true);
+        return result.asString().contains("Service \"module.resolved.service.\"deployment."
+                + warName
+                + "\".main\" (class org.jboss.msc.service.ValueService) mode ACTIVE state UP ");
     }
 
     private ModelNode addDeploymentScanner() throws Exception {
@@ -205,5 +233,11 @@ public class DeploymentScannerTestCase extends ContainerResourceMgmtTestBase {
 
     private PathAddress getTestDeploymentScannerResourcePath() {
         return PathAddress.pathAddress(PathElement.pathElement("subsystem", "deployment-scanner"), PathElement.pathElement("scanner", "testScanner"));
+    }
+
+    private void prepareDeployment() {
+        ShrinkWrap.create(WebArchive.class, DEPLOYMENT_NAME)
+                .addClass(SimpleServlet.class)
+                .as(ZipExporter.class).exportTo(new File(deployDir, DEPLOYMENT_NAME), true);
     }
 }
