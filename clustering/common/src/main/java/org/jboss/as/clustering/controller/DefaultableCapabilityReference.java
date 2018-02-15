@@ -25,8 +25,6 @@ package org.jboss.as.clustering.controller;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.jboss.as.controller.OperationContext;
-import org.jboss.as.controller.PathAddress;
 import org.wildfly.clustering.service.DefaultableBinaryRequirement;
 import org.wildfly.clustering.service.DefaultableUnaryRequirement;
 
@@ -43,7 +41,7 @@ public class DefaultableCapabilityReference extends CapabilityReference {
      * @param requirement the requirement of the specified capability
      */
     public DefaultableCapabilityReference(Capability capability, DefaultableUnaryRequirement requirement) {
-        super(capability, requirement, (context, value) -> Optional.of((value != null) ? requirement.resolve(value) : requirement.getDefaultRequirement().getName()));
+        super(capability, requirement, (parameters) -> Optional.of((parameters.getValue() != null) ? requirement.resolve(parameters.getValue()) : requirement.getDefaultRequirement().getName()));
     }
 
     /**
@@ -52,7 +50,7 @@ public class DefaultableCapabilityReference extends CapabilityReference {
      * @param requirement the requirement of the specified capability
      */
     public DefaultableCapabilityReference(Capability capability, DefaultableBinaryRequirement requirement) {
-        this(capability, requirement, context -> context.getCurrentAddressValue());
+        this(capability, requirement, ResolverParameters::getAddressValue);
     }
 
     /**
@@ -62,7 +60,7 @@ public class DefaultableCapabilityReference extends CapabilityReference {
      * @param parentAttribute the attribute containing the value of the parent dynamic component of the requirement
      */
     public DefaultableCapabilityReference(Capability capability, DefaultableBinaryRequirement requirement, Attribute parentAttribute) {
-        this(capability, requirement, context -> context.readResource(PathAddress.EMPTY_ADDRESS, false).getModel().get(parentAttribute.getName()).asString());
+        this(capability, requirement, parameters -> parameters.getResource().getModel().get(parentAttribute.getName()).asString());
     }
 
     /**
@@ -71,7 +69,7 @@ public class DefaultableCapabilityReference extends CapabilityReference {
      * @param requirement the requirement of the specified capability
      * @param parentResolver the resolver of the parent dynamic component of the requirement
      */
-    public DefaultableCapabilityReference(Capability capability, DefaultableBinaryRequirement requirement, Function<OperationContext, String> parentResolver) {
-        super(capability, requirement, (context, value) -> Optional.of((value != null) ? requirement.resolve(parentResolver.apply(context), value) : requirement.getDefaultRequirement().resolve(parentResolver.apply(context))));
+    public DefaultableCapabilityReference(Capability capability, DefaultableBinaryRequirement requirement, Function<ResolverParameters, String> parentResolver) {
+        super(capability, requirement, (parameters) -> Optional.of((parameters.getValue() != null) ? requirement.resolve(parentResolver.apply(parameters), parameters.getValue()) : requirement.getDefaultRequirement().resolve(parentResolver.apply(parameters))));
     }
 }

@@ -23,13 +23,11 @@
 package org.jboss.as.clustering.controller;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.jboss.as.controller.CapabilityReferenceRecorder;
 import org.jboss.as.controller.OperationContext;
-import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.registry.Resource;
 import org.wildfly.clustering.service.BinaryRequirement;
 import org.wildfly.clustering.service.Requirement;
@@ -43,7 +41,7 @@ public class CapabilityReference implements CapabilityReferenceRecorder {
 
     private final Capability capability;
     private final Requirement requirement;
-    private final BiFunction<OperationContext, String, Optional<String>> requirementResolver;
+    private final Function<ResolverParameters, Optional<String>> requirementResolver;
 
     /**
      * Creates a new reference between the specified capability and the specified requirement
@@ -51,7 +49,7 @@ public class CapabilityReference implements CapabilityReferenceRecorder {
      * @param requirement the requirement of the specified capability
      */
     public CapabilityReference(Capability capability, UnaryRequirement requirement) {
-        this(capability, requirement, (context, value) -> (value != null) ? Optional.of(requirement.resolve(value)) : Optional.empty());
+        this(capability, requirement, (parameters) -> (parameters.getValue() != null) ? Optional.of(requirement.resolve(parameters.getValue())) : Optional.empty());
     }
 
     /**
@@ -60,7 +58,7 @@ public class CapabilityReference implements CapabilityReferenceRecorder {
      * @param requirement the requirement of the specified capability
      */
     public CapabilityReference(Capability capability, BinaryRequirement requirement) {
-        this(capability, requirement, OperationContext::getCurrentAddressValue);
+        this(requirement, capability, ResolverParameters::getAddressValue);
     }
 
     /**
@@ -70,7 +68,7 @@ public class CapabilityReference implements CapabilityReferenceRecorder {
      * @param parentAttribute the attribute containing the value of the parent dynamic component of the requirement
      */
     public CapabilityReference(Capability capability, BinaryRequirement requirement, Attribute parentAttribute) {
-        this(capability, requirement, context -> context.readResource(PathAddress.EMPTY_ADDRESS, false).getModel().get(parentAttribute.getName()).asString());
+        this(requirement, capability, (parameters) -> parameters.getResource().getModel().get(parentAttribute.getName()).asString());
     }
 
     /**
@@ -79,11 +77,11 @@ public class CapabilityReference implements CapabilityReferenceRecorder {
      * @param requirement the requirement of the specified capability
      * @param parentResolver the resolver of the parent dynamic component of the requirement
      */
-    public CapabilityReference(Capability capability, BinaryRequirement requirement, Function<OperationContext, String> parentResolver) {
-        this(capability, requirement, (context, value) -> (value != null) ? Optional.of(requirement.resolve(parentResolver.apply(context), value)) : Optional.empty());
+    public CapabilityReference(BinaryRequirement requirement, Capability capability, Function<ResolverParameters, String> parentResolver) {
+        this(capability, requirement, (parameters) -> (parameters.getValue() != null) ? Optional.of(requirement.resolve(parentResolver.apply(parameters), parameters.getValue())) : Optional.empty());
     }
 
-    CapabilityReference(Capability capability, Requirement requirement, BiFunction<OperationContext, String, Optional<String>> requirementResolver) {
+    CapabilityReference(Capability capability, Requirement requirement, Function<ResolverParameters, Optional<String>> requirementResolver) {
         this.capability = capability;
         this.requirement = requirement;
         this.requirementResolver = requirementResolver;
@@ -92,13 +90,13 @@ public class CapabilityReference implements CapabilityReferenceRecorder {
     @Override
     public void addCapabilityRequirements(OperationContext context, Resource resource,  String attributeName, String... values) {
         String dependentName = this.capability.resolve(context.getCurrentAddress()).getName();
-        Stream.of(values).forEach(value -> this.requirementResolver.apply(context, value).ifPresent(requirementName -> context.registerAdditionalCapabilityRequirement(requirementName, dependentName, attributeName)));
+        Stream.of(values).forEach(value -> this.requirementResolver.apply(new ResolverParameters(context, value)).ifPresent(requirementName -> context.registerAdditionalCapabilityRequirement(requirementName, dependentName, attributeName)));
     }
 
     @Override
     public void removeCapabilityRequirements(OperationContext context, Resource resource, String attributeName, String... values) {
         String dependentName = this.capability.resolve(context.getCurrentAddress()).getName();
-        Stream.of(values).forEach(value -> this.requirementResolver.apply(context, value).ifPresent(requirementName -> context.deregisterCapabilityRequirement(requirementName, dependentName)));
+        Stream.of(values).forEach(value -> this.requirementResolver.apply(new ResolverParameters(context.getCurrentAddress(), resource, value)).ifPresent(requirementName -> context.deregisterCapabilityRequirement(requirementName, dependentName)));
     }
 
     @Override

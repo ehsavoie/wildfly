@@ -66,17 +66,16 @@ public class RemoteSiteResourceDefinition extends ChildResourceDefinition<Manage
         private final RuntimeCapability<Void> definition;
 
         Capability(String name) {
-            this.definition = RuntimeCapability.Builder.of(name, true).build();
+            this.definition = RuntimeCapability.Builder.of(name, true)
+                    .setDynamicNameMapper(pathElements -> new String[]{
+                            pathElements.getParent().getLastElement().getValue(),
+                            pathElements.getLastElement().getValue()})
+                    .build();
         }
 
         @Override
         public RuntimeCapability<Void> getDefinition() {
             return this.definition;
-        }
-
-        @Override
-        public RuntimeCapability<Void> resolve(PathAddress address) {
-            return this.definition.fromBaseCapability(address.getParent().getParent().getLastElement().getValue(), address.getLastElement().getValue());
         }
     }
 

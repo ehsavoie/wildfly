@@ -58,7 +58,11 @@ public class AuthTokenResourceDefinition<T extends AuthToken> extends ChildResou
         private final RuntimeCapability<Void> definition;
 
         Capability(String name, Class<?> type) {
-            this.definition = RuntimeCapability.Builder.of(name, true).setServiceType(type).setAllowMultipleRegistrations(true).build();
+            this.definition = RuntimeCapability.Builder.of(name, true)
+                    .setDynamicNameMapper(pathElements -> new String[]{
+                            pathElements.getParent().getParent().getLastElement().getValue()})
+                    .setServiceType(type)
+                    .setAllowMultipleRegistrations(true).build();
         }
 
         @Override

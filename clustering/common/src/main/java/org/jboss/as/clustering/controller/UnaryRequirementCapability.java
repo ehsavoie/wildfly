@@ -22,7 +22,9 @@
 
 package org.jboss.as.clustering.controller;
 
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.jboss.as.controller.PathAddress;
 
 import org.jboss.as.controller.capability.RuntimeCapability;
 import org.wildfly.clustering.service.UnaryRequirement;
@@ -50,6 +52,13 @@ public class UnaryRequirementCapability implements Capability {
      */
     public UnaryRequirementCapability(UnaryRequirement requirement, UnaryOperator<RuntimeCapability.Builder<Void>> configurator) {
         this.definition = configurator.apply(RuntimeCapability.Builder.of(requirement.getName(), true).setServiceType(requirement.getType())).build();
+    }
+
+    public UnaryRequirementCapability(UnaryRequirement requirement, UnaryOperator<RuntimeCapability.Builder<Void>> configurator, Function<PathAddress,String[]> mapper) {
+        this.definition = configurator.apply(RuntimeCapability.Builder
+                .of(requirement.getName(), true)
+                .setDynamicNameMapper(mapper)
+                .setServiceType(requirement.getType())).build();
     }
 
     @Override

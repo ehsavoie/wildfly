@@ -71,17 +71,17 @@ public class ProtocolResourceDefinition<P extends Protocol> extends AbstractProt
         private final RuntimeCapability<Void> definition;
 
         Capability(String name) {
-            this.definition = RuntimeCapability.Builder.of(name, true).setAllowMultipleRegistrations(true).build();
+            this.definition = RuntimeCapability.Builder.of(name, true)
+                    .setAllowMultipleRegistrations(true)
+                    .setDynamicNameMapper(pathElements -> new String[]{
+                            pathElements.getParent().getLastElement().getValue(),
+                            pathElements.getLastElement().getValue()})
+                    .build();
         }
 
         @Override
         public RuntimeCapability<?> getDefinition() {
             return this.definition;
-        }
-
-        @Override
-        public RuntimeCapability<?> resolve(PathAddress address) {
-            return this.definition.fromBaseCapability(address.getParent().getLastElement().getValue(), address.getLastElement().getValue());
         }
     }
 

@@ -96,7 +96,10 @@ public class TransportResourceDefinition<T extends TP> extends AbstractProtocolR
         private final RuntimeCapability<Void> definition;
 
         Capability(String name) {
-            this.definition = RuntimeCapability.Builder.of(name, true).build();
+            this.definition = RuntimeCapability.Builder.of(name, true)
+                    .setDynamicNameMapper(pathElements -> new String[]{
+                            pathElements.getParent().getLastElement().getValue()})
+                    .build();
         }
 
         @Override
@@ -104,10 +107,6 @@ public class TransportResourceDefinition<T extends TP> extends AbstractProtocolR
             return this.definition;
         }
 
-        @Override
-        public RuntimeCapability<Void> resolve(PathAddress address) {
-            return this.definition.fromBaseCapability(address.getParent().getLastElement().getValue());
-        }
     }
 
     enum Attribute implements org.jboss.as.clustering.controller.Attribute {
