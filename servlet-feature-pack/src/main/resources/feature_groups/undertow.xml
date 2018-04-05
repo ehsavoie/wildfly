@@ -3,6 +3,7 @@
     <feature-group name="undertow-base"/>
     <feature spec="subsystem.undertow">
         <param name="default-security-domain" value="other"/>
+        <!--
         <feature spec="subsystem.undertow.configuration.filter">
             <feature spec="subsystem.undertow.configuration.filter.response-header">
                 <param name="response-header" value="server-header"/>
@@ -15,6 +16,7 @@
                 <param name="header-value" value="Undertow/1"/>
             </feature>
         </feature>
+        -->
         <feature spec="subsystem.undertow.configuration.handler">
             <feature spec="subsystem.undertow.configuration.handler.file">
                 <param name="file" value="welcome-content"/>
@@ -26,14 +28,16 @@
             <feature spec="subsystem.undertow.server.host">
                 <param name="host" value="default-host" />
                 <param name="alias" value="[localhost]"/>
+                <!--
                 <feature spec="subsystem.undertow.server.host.filter-ref">
                     <param name="filter-ref" value="server-header"/>
                 </feature>
                 <feature spec="subsystem.undertow.server.host.filter-ref">
                     <param name="filter-ref" value="x-powered-by-header"/>
                 </feature>
+                -->
                 <feature spec="subsystem.undertow.server.host.location">
-                    <param name="location" value="\/"/>
+                    <param name="location" value="/"/>
                     <param name="handler" value="welcome-content"/>
                 </feature>
                 <feature spec="subsystem.undertow.server.host.setting.http-invoker">

@@ -11,4 +11,5 @@
 
     <feature-group name="basic-profile"/>
 
+    <feature-group name="elytron-permissions-workaround"/>
 </feature-group-spec>

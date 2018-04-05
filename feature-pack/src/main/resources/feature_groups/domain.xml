@@ -26,5 +26,4 @@
     </feature>
     <feature-group name="access-control"/>
     <feature-group name="domain-host-excludes"/>
-
 </feature-group-spec>

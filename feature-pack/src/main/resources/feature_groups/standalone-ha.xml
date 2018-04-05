@@ -29,4 +29,5 @@
     </origin>
     <feature-group name="basic-ha-profile"/>
 
+    <feature-group name="elytron-permissions-workaround"/>
 </feature-group-spec>
