@@ -2,6 +2,18 @@
     <global-client thread-pool-max-size="${global.client.thread-pool-max-size:32}"
                    scheduled-thread-pool-max-size="${global.client.scheduled.thread-pool-max-size:54}" />
 
+    <thread-factory name="clientFactory" group-name="factory1-threads" thread-name-pattern="%G %i" priority="5"/>
+
+    <thread-factory name="serverFactory"/>
+
+    <thread-pool name="global-client" max-threads="10">
+        <keepalive-time time="10" unit="seconds"/>
+    </thread-pool>
+
+    <scheduled-thread-pool name="global-client" max-threads="${prop.max-thread-count:10}" thread-factory="clientFactory">
+        <keepalive-time time="10" unit="seconds"/>
+    </scheduled-thread-pool>
+
     <http-connector name="client-http"
                     socket-binding="http"
                     endpoint="http"
@@ -144,6 +156,16 @@
         <discovery-group name="groupU"
                          jgroups-channel="ee"
                          jgroups-cluster="activemq-cluster"/>
+
+        <journal-thread-pool name="server" max-threads="10">
+            <keepalive-time time="10" unit="seconds"/>
+        </journal-thread-pool>
+        <thread-pool name="server" max-threads="10">
+            <keepalive-time time="10" unit="seconds"/>
+        </thread-pool>
+        <scheduled-thread-pool name="server" max-threads="${prop.max-thread-count:10}" thread-factory="clientFactory">
+            <keepalive-time time="10" unit="seconds"/>
+        </scheduled-thread-pool>
     </server>
     <server name="other">
         <replication-master />

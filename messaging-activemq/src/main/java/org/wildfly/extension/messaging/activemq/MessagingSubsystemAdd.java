@@ -28,16 +28,23 @@ import static org.wildfly.extension.messaging.activemq.MessagingSubsystemRootRes
 import static org.wildfly.extension.messaging.activemq.MessagingSubsystemRootResourceDefinition.GLOBAL_CLIENT_THREAD_POOL_MAX_SIZE;
 
 import java.util.Properties;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.registry.Resource.ResourceEntry;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
+import org.jboss.as.threads.ManagedJBossThreadPoolExecutorService;
+import org.jboss.as.threads.ManagedScheduledExecutorService;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -51,6 +58,7 @@ import org.wildfly.extension.messaging.activemq.deployment.MessagingDependencyPr
 import org.wildfly.extension.messaging.activemq.deployment.MessagingXmlInstallDeploymentUnitProcessor;
 import org.wildfly.extension.messaging.activemq.deployment.MessagingXmlParsingDeploymentUnitProcessor;
 import org.wildfly.extension.messaging.activemq.deployment.injection.CDIDeploymentProcessor;
+import org.wildfly.extension.messaging.activemq.ha.ManagementHelper;
 import org.wildfly.extension.messaging.activemq.logging.MessagingLogger;
 
 /**
@@ -64,6 +72,13 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     private MessagingSubsystemAdd() {
         super(MessagingSubsystemRootResourceDefinition.ATTRIBUTES);
+    }
+
+    @Override
+    public void execute(OperationContext context, ModelNode operation) throws OperationFailedException {
+        ManagementHelper.checkNoOtherSibling(CommonAttributes.THREAD_POOL);
+        ManagementHelper.checkNoOtherSibling(CommonAttributes.SCHEDULED_THREAD_POOL);
+        super.execute(context, operation);
     }
 
     @Override
@@ -115,19 +130,53 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
             scheduledThreadPoolMaxSizeValue = null;
         }
 
-        if (threadPoolMaxSizeValue != null || scheduledThreadPoolMaxSizeValue != null) {
-            ActiveMQClient.initializeGlobalThreadPoolProperties();
-            if(threadPoolMaxSizeValue == null) {
-                threadPoolMaxSizeValue = ActiveMQClient.getGlobalThreadPoolSize();
-            }
-            if(scheduledThreadPoolMaxSizeValue == null) {
-                scheduledThreadPoolMaxSizeValue = ActiveMQClient.getGlobalScheduledThreadPoolSize();
-            }
-            MessagingLogger.ROOT_LOGGER.debugf("Setting global client thread pool size to: regular=%s, scheduled=%s", threadPoolMaxSizeValue, scheduledThreadPoolMaxSizeValue);
-            ActiveMQClient.setGlobalThreadPoolProperties(threadPoolMaxSizeValue, scheduledThreadPoolMaxSizeValue);
+        final ServiceBuilder builder = context.getServiceTarget().addService(MessagingServices.ACTIVEMQ_CLIENT_THREAD_POOL);
+        builder.setInstance(processThreadPools(context, builder, threadPoolMaxSizeValue, scheduledThreadPoolMaxSizeValue));
+        builder.install();
+    }
+
+    private static ThreadPoolService processThreadPools(final OperationContext context, ServiceBuilder builder,
+            Integer threadPoolMaxSizeValue, Integer scheduledThreadPoolMaxSizeValue) throws OperationFailedException {
+        PathAddress threadPool = null;
+        PathAddress scheduledThreadPool = null;
+        Set<ResourceEntry> entries = context.readResource(PathAddress.EMPTY_ADDRESS).getChildren(CommonAttributes.THREAD_POOL);
+        if (entries.size() > 0) {
+            threadPool = context.getCurrentAddress().append(entries.iterator().next().getPathElement());
         }
-        context.getServiceTarget().addService(MessagingServices.ACTIVEMQ_CLIENT_THREAD_POOL, new ThreadPoolService())
-                .install();
+        entries = context.readResource(PathAddress.EMPTY_ADDRESS).getChildren(CommonAttributes.SCHEDULED_THREAD_POOL);
+        if (entries.size() > 0) {
+            scheduledThreadPool = context.getCurrentAddress().append(entries.iterator().next().getPathElement());
+        }
+        if (threadPool != null && scheduledThreadPool != null) {
+            if (threadPoolMaxSizeValue != null || scheduledThreadPoolMaxSizeValue != null) {
+                if (threadPoolMaxSizeValue != null) {
+                    MessagingLogger.ROOT_LOGGER.settingThreadMaxSizeAndThreadPools(GLOBAL_CLIENT_THREAD_POOL_MAX_SIZE.getName(),
+                            threadPool.getLastElement().getValue());
+                }
+                if (scheduledThreadPoolMaxSizeValue != null) {
+                    MessagingLogger.ROOT_LOGGER.settingThreadMaxSizeAndThreadPools(GLOBAL_CLIENT_SCHEDULED_THREAD_POOL_MAX_SIZE.getName(),
+                            scheduledThreadPool.getLastElement().getValue());
+                }
+            }
+            return new ThreadPoolService(
+                    builder.requires(ThreadPools.THREAD_POOL_CAPABILITY.getCapabilityServiceName(threadPool)),
+                    builder.requires(ThreadPools.SCHEDULED_THREAD_POOL_CAPABILITY.getCapabilityServiceName(scheduledThreadPool)));
+        } else {
+            if (threadPoolMaxSizeValue != null || scheduledThreadPoolMaxSizeValue != null) {
+                Integer threadPoolMaxSize = threadPoolMaxSizeValue;
+                Integer scheduledThreadPoolMaxSize = scheduledThreadPoolMaxSizeValue;
+                ActiveMQClient.initializeGlobalThreadPoolProperties();
+                if (threadPoolMaxSize == null) {
+                    threadPoolMaxSize = ActiveMQClient.getGlobalThreadPoolSize();
+                }
+                if (scheduledThreadPoolMaxSize == null) {
+                    scheduledThreadPoolMaxSize = ActiveMQClient.getGlobalScheduledThreadPoolSize();
+                }
+                MessagingLogger.ROOT_LOGGER.debugf("Setting global client thread pool size to: regular=%s, scheduled=%s", threadPoolMaxSize, scheduledThreadPoolMaxSize);
+                ActiveMQClient.setGlobalThreadPoolProperties(threadPoolMaxSize, scheduledThreadPoolMaxSize);
+            }
+        }
+        return new ThreadPoolService();
     }
 
     /**
@@ -136,11 +185,22 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
      */
     private static class ThreadPoolService implements Service<Void> {
 
+        private final Supplier<ManagedScheduledExecutorService> scheduledPoolSupplier;
+        private final Supplier<ManagedJBossThreadPoolExecutorService> poolSupplier;
+
         public ThreadPoolService() {
+            this(null, null);
         }
 
+        public ThreadPoolService(Supplier<ManagedJBossThreadPoolExecutorService> poolSupplier, Supplier<ManagedScheduledExecutorService> scheduledPoolSupplier) {
+            this.poolSupplier = poolSupplier;
+            this.scheduledPoolSupplier = scheduledPoolSupplier;
+        }
         @Override
         public void start(StartContext startContext) throws StartException {
+            if(poolSupplier != null && scheduledPoolSupplier != null) {
+                ActiveMQClient.injectPools(poolSupplier.get(), scheduledPoolSupplier.get());
+            }
         }
 
         @Override

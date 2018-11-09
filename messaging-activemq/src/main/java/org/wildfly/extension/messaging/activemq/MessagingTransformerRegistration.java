@@ -68,13 +68,25 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
     public void registerTransformers(SubsystemTransformerRegistration registration) {
         ChainedTransformationDescriptionBuilder builder = TransformationDescriptionBuilder.Factory.createChainedSubystemInstance(registration.getCurrentSubsystemVersion());
 
+        registerTransformers_WF_16(builder.createBuilder(MessagingExtension.VERSION_6_0_0, MessagingExtension.VERSION_5_0_0));
         registerTransformers_WF_15(builder.createBuilder(MessagingExtension.VERSION_5_0_0, MessagingExtension.VERSION_4_0_0));
         registerTransformers_EAP_7_2_0(builder.createBuilder(MessagingExtension.VERSION_4_0_0, MessagingExtension.VERSION_3_0_0));
         registerTransformers_EAP_7_1_0(builder.createBuilder(MessagingExtension.VERSION_3_0_0, MessagingExtension.VERSION_2_0_0));
         registerTransformers_EAP_7_0_0(builder.createBuilder(MessagingExtension.VERSION_2_0_0, MessagingExtension.VERSION_1_0_0));
+        builder.buildAndRegister(registration, new ModelVersion[] {
+            MessagingExtension.VERSION_1_0_0, MessagingExtension.VERSION_2_0_0,
+            MessagingExtension.VERSION_3_0_0, MessagingExtension.VERSION_4_0_0, MessagingExtension.VERSION_5_0_0 });
+    }
 
-        builder.buildAndRegister(registration, new ModelVersion[] { MessagingExtension.VERSION_1_0_0, MessagingExtension.VERSION_2_0_0,
-            MessagingExtension.VERSION_3_0_0, MessagingExtension.VERSION_4_0_0, MessagingExtension.VERSION_5_0_0});
+    private static void registerTransformers_WF_16(ResourceTransformationDescriptionBuilder subsystem) {
+        subsystem.rejectChildResource(ThreadPools.SCHEDULED_THREAD_POOL_PATH);
+        subsystem.rejectChildResource(ThreadPools.THREAD_FACTORY_PATH);
+        subsystem.rejectChildResource(ThreadPools.THREAD_POOL_PATH);
+
+        ResourceTransformationDescriptionBuilder server = subsystem.addChildResource(MessagingExtension.SERVER_PATH);
+        server.rejectChildResource(ThreadPools.SCHEDULED_THREAD_POOL_PATH);
+        server.rejectChildResource(ThreadPools.THREAD_POOL_PATH);
+        server.rejectChildResource(ThreadPools.JOURNAl_THREAD_POOL_PATH);
     }
 
     private static void registerTransformers_WF_15(ResourceTransformationDescriptionBuilder subsystem) {

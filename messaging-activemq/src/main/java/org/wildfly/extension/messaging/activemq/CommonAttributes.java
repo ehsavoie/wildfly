@@ -380,6 +380,7 @@ public interface CommonAttributes {
     String ID = "id";
     String IN_VM_ACCEPTOR = "in-vm-acceptor";
     String IN_VM_CONNECTOR = "in-vm-connector";
+    String JOURNAL_THREAD_POOL = "journal-thread-pool";
     String LEGACY = "legacy";
     String LEGACY_CONNECTION_FACTORY = "legacy-connection-factory";
     String JMS_BRIDGE = "jms-bridge";
@@ -447,6 +448,9 @@ public interface CommonAttributes {
     String SUBSCRIPTION_COUNT = "subscription-count";
     String SUBSYSTEM = "subsystem";
     String TARGET = "target";
+    String THREAD_FACTORY = org.jboss.as.threads.CommonAttributes.THREAD_FACTORY;
+    String THREAD_POOL = "thread-pool";
+    String SCHEDULED_THREAD_POOL = org.jboss.as.threads.CommonAttributes.SCHEDULED_THREAD_POOL;
     String TOPIC_ADDRESS = "topic-address";
     String TYPE_ATTR_NAME = "type";
     String USE_INVM = "use-invm";

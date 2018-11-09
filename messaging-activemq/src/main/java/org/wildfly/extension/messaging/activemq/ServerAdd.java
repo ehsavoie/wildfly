@@ -112,6 +112,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
 import javax.management.MBeanServer;
@@ -140,6 +142,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.Resource;
+import org.jboss.as.controller.registry.Resource.ResourceEntry;
 import org.jboss.as.controller.security.CredentialReference;
 import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.as.network.OutboundSocketBinding;
@@ -161,6 +164,7 @@ import org.wildfly.clustering.dispatcher.CommandDispatcherFactory;
 import org.wildfly.clustering.spi.ClusteringDefaultRequirement;
 import org.wildfly.clustering.spi.ClusteringRequirement;
 import org.wildfly.common.function.ExceptionSupplier;
+import org.wildfly.extension.messaging.activemq.ha.ManagementHelper;
 import org.wildfly.extension.messaging.activemq.jms.JMSService;
 import org.wildfly.extension.messaging.activemq.logging.MessagingLogger;
 import org.wildfly.security.auth.server.SecurityDomain;
@@ -186,6 +190,13 @@ class ServerAdd extends AbstractAddStepHandler {
 
     private ServerAdd() {
         super(ACTIVEMQ_SERVER_CAPABILITY, ServerDefinition.ATTRIBUTES);
+    }
+
+    @Override
+    public void execute(OperationContext context, ModelNode operation) throws OperationFailedException {
+        ManagementHelper.checkNoOtherSibling(CommonAttributes.THREAD_POOL);
+        ManagementHelper.checkNoOtherSibling(CommonAttributes.SCHEDULED_THREAD_POOL);
+        super.execute(context, operation);
     }
 
     @Override
@@ -419,7 +430,33 @@ class ServerAdd extends AbstractAddStepHandler {
                         }
                     }
                 }
-
+                Optional<Supplier<ExecutorService>> threadPoolSupplier = Optional.empty();
+                Optional<Supplier<ScheduledExecutorService>> scheduledThreadPoolSupplier = Optional.empty();
+                Optional<Supplier<ExecutorService>> ioThreadPoolSupplier = Optional.empty();
+                Set<ResourceEntry> entries = context.readResource(PathAddress.EMPTY_ADDRESS).getChildren(CommonAttributes.THREAD_POOL);
+                if (entries.size() > 0) {
+                    PathElement entryPath = entries.iterator().next().getPathElement();
+                    if (model.hasDefined(THREAD_POOL_MAX_SIZE.getName())) {
+                        MessagingLogger.ROOT_LOGGER.settingThreadMaxSizeAndThreadPools(THREAD_POOL_MAX_SIZE.getName(), entryPath.getValue());
+                    }
+                    threadPoolSupplier = Optional.of(serviceBuilder.requires(ThreadPools.THREAD_POOL_CAPABILITY.getCapabilityServiceName(context.getCurrentAddress().append(entryPath))));
+                }
+                entries = context.readResource(PathAddress.EMPTY_ADDRESS).getChildren(CommonAttributes.SCHEDULED_THREAD_POOL);
+                if (entries.size() > 0) {
+                    PathElement entryPath = entries.iterator().next().getPathElement();
+                    if (model.hasDefined(SCHEDULED_THREAD_POOL_MAX_SIZE.getName())) {
+                        MessagingLogger.ROOT_LOGGER.settingThreadMaxSizeAndThreadPools(SCHEDULED_THREAD_POOL_MAX_SIZE.getName(), entryPath.getValue());
+                    }
+                    scheduledThreadPoolSupplier = Optional.of(serviceBuilder.requires(ThreadPools.SCHEDULED_THREAD_POOL_CAPABILITY.getCapabilityServiceName(context.getCurrentAddress().append(entryPath))));
+                }
+                entries = context.readResource(PathAddress.EMPTY_ADDRESS).getChildren(CommonAttributes.JOURNAL_THREAD_POOL);
+                if (entries.size() > 0) {
+                     PathElement entryPath = entries.iterator().next().getPathElement();
+                    if (model.hasDefined(JOURNAL_MAX_IO.getName())) {
+                        MessagingLogger.ROOT_LOGGER.settingThreadMaxSizeAndThreadPools(JOURNAL_MAX_IO.getName(), entryPath.getValue());
+                    }
+                    ioThreadPoolSupplier = Optional.of(serviceBuilder.requires(ThreadPools.JOURNAL_THREAD_POOL_CAPABILITY.getCapabilityServiceName(context.getCurrentAddress().append(entryPath))));
+                }
                 // Create the ActiveMQ Service
                 final ActiveMQServerService serverService = new ActiveMQServerService(
                         configuration,
@@ -435,7 +472,10 @@ class ServerAdd extends AbstractAddStepHandler {
                         elytronSecurityDomain,
                         securityDomainContext,
                         mbeanServer,
-                        dataSource
+                        dataSource,
+                        threadPoolSupplier,
+                        scheduledThreadPoolSupplier,
+                        ioThreadPoolSupplier
                 );
                 // inject credential-references for bridges
                 addBridgeCredentialStoreReference(serverService, configuration, BridgeDefinition.CREDENTIAL_REFERENCE, context, model, serviceBuilder);

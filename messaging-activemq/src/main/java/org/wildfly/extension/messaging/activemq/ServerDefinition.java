@@ -46,6 +46,7 @@ import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.JournalType;
 import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.ModelVersion;
 import org.jboss.as.controller.ObjectTypeAttributeDefinition;
 import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
@@ -126,7 +127,9 @@ public class ServerDefinition extends PersistentResourceDefinition {
             .setCorrector(InfiniteOrPositiveValidators.NEGATIVE_VALUE_CORRECTOR)
             .setValidator(InfiniteOrPositiveValidators.INT_INSTANCE)
             .setRestartAllServices()
+            .setDeprecated(ModelVersion.create(5, 0, 0))
             .build();
+
     public static final SimpleAttributeDefinition SECURITY_DOMAIN = create("security-domain", ModelType.STRING)
             .setAttributeGroup("security")
             .setXmlName("domain")
@@ -158,8 +161,10 @@ public class ServerDefinition extends PersistentResourceDefinition {
             .setAllowExpression(true)
             .setCorrector(InfiniteOrPositiveValidators.NEGATIVE_VALUE_CORRECTOR)
             .setValidator(InfiniteOrPositiveValidators.INT_INSTANCE)
+            .setDeprecated(ModelVersion.create(5, 0, 0))
             .setRestartAllServices()
             .build();
+
     public static final SimpleAttributeDefinition OVERRIDE_IN_VM_SECURITY = create("override-in-vm-security", BOOLEAN)
             .setAttributeGroup("security")
             .setDefaultValue(new ModelNode(true))
@@ -831,29 +836,28 @@ public class ServerDefinition extends PersistentResourceDefinition {
     protected List<? extends PersistentResourceDefinition> getChildren() {
         List<PersistentResourceDefinition> children = new ArrayList();
         // Static resources
-        children.addAll(Arrays.asList(
-                // HA policy
-                LiveOnlyDefinition.INSTANCE,
-                ReplicationMasterDefinition.INSTANCE,
-                ReplicationSlaveDefinition.INSTANCE,
-                ReplicationColocatedDefinition.INSTANCE,
-                SharedStoreMasterDefinition.INSTANCE,
-                SharedStoreSlaveDefinition.INSTANCE,
-                SharedStoreColocatedDefinition.INSTANCE,
+        // HA policy
+        children.add(LiveOnlyDefinition.INSTANCE);
+        children.add(ReplicationMasterDefinition.INSTANCE);
+        children.add(ReplicationSlaveDefinition.INSTANCE);
+        children.add(ReplicationColocatedDefinition.INSTANCE);
+        children.add(SharedStoreMasterDefinition.INSTANCE);
+        children.add(SharedStoreSlaveDefinition.INSTANCE);
+        children.add(SharedStoreColocatedDefinition.INSTANCE);
 
-                AddressSettingDefinition.INSTANCE,
-                SecuritySettingDefinition.INSTANCE,
+        children.add(AddressSettingDefinition.INSTANCE);
+        children.add(SecuritySettingDefinition.INSTANCE);
 
-                // Acceptors
-                HTTPAcceptorDefinition.INSTANCE,
+        // Acceptors
+        children.add(HTTPAcceptorDefinition.INSTANCE);
 
-                DivertDefinition.INSTANCE,
-                ConnectorServiceDefinition.INSTANCE,
-                GroupingHandlerDefinition.INSTANCE,
+        children.add(DivertDefinition.INSTANCE);
+        children.add(ConnectorServiceDefinition.INSTANCE);
+        children.add(GroupingHandlerDefinition.INSTANCE);
 
-                // JMS resources
-                LegacyConnectionFactoryDefinition.INSTANCE,
-                PooledConnectionFactoryDefinition.INSTANCE));
+        // JMS resources
+        children.add(LegacyConnectionFactoryDefinition.INSTANCE);
+        children.add(PooledConnectionFactoryDefinition.INSTANCE);
 
         // Dynamic resources (depending on registerRuntimeOnly)
         // acceptors
@@ -875,6 +879,11 @@ public class ServerDefinition extends PersistentResourceDefinition {
         children.add(new JMSQueueDefinition(false, registerRuntimeOnly));
         children.add(new JMSTopicDefinition(false, registerRuntimeOnly));
         children.add(new ConnectionFactoryDefinition(registerRuntimeOnly));
+
+        //Thread pools
+        children.add(ThreadPools.JOURNAL_THREAD_POOL);
+        children.add(ThreadPools.SCHEDULED_THREAD_POOL);
+        children.add(ThreadPools.THREAD_POOL);
 
         return children;
     }
