@@ -24,18 +24,42 @@
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns="urn:jboss:domain:messaging-activemq:6.0"
+           xmlns:threads="urn:jboss:domain:threads:2.0"
            targetNamespace="urn:jboss:domain:messaging-activemq:6.0"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
            version="6.0">
+
+    <xs:import namespace="urn:jboss:domain:threads:2.0" schemaLocation="wildfly-threads_2_0.xsd"/>
 
     <xs:element name="subsystem">
         <xs:complexType>
             <xs:sequence>
                 <xs:element maxOccurs="1" minOccurs="0" name="global-client">
                     <xs:complexType>
-                        <xs:attribute name="thread-pool-max-size" type="xs:int" />
-                        <xs:attribute name="scheduled-thread-pool-max-size" type="xs:int" />
+                        <xs:attribute name="thread-pool-max-size" type="xs:int" use="optional" />
+                        <xs:attribute name="scheduled-thread-pool-max-size" type="xs:int" use="optional" />
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="thread-factory" type="threads:thread-factory" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="thread-pool" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="keepalive-time" type="threads:time" minOccurs="0" maxOccurs="1" />
+                        </xs:sequence>
+                        <xs:attribute name="name" type="xs:string" use="required" />
+                        <xs:attribute name="max-threads" type="xs:int" use="optional"/>
+                        <xs:attribute name="thread-factory" type="xs:string" use="optional" />
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="scheduled-thread-pool" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="keepalive-time" type="threads:time" minOccurs="0" maxOccurs="1" />
+                        </xs:sequence>
+                        <xs:attribute name="name" type="xs:string" use="required" />
+                        <xs:attribute name="max-threads" type="xs:int" use="optional"/>
+                        <xs:attribute name="thread-factory" type="xs:string" use="optional" />
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="http-connector" type="http-connectorType" minOccurs="0" maxOccurs="unbounded" />
@@ -284,6 +308,36 @@
                 </xs:element>
             </xs:choice>
 
+            <xs:element name="journal-thread-pool" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="keepalive-time" type="threads:time" minOccurs="0" maxOccurs="1" />
+                    </xs:sequence>
+                    <xs:attribute name="name" type="xs:string" use="required" />
+                    <xs:attribute name="max-threads" type="xs:int" use="optional"/>
+                    <xs:attribute name="thread-factory" type="xs:string" use="optional" />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="thread-pool" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="keepalive-time" type="threads:time" minOccurs="0" maxOccurs="1" />
+                    </xs:sequence>
+                    <xs:attribute name="name" type="xs:string" use="required" />
+                    <xs:attribute name="max-threads" type="xs:int" use="optional"/>
+                    <xs:attribute name="thread-factory" type="xs:string" use="optional" />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="scheduled-thread-pool" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="keepalive-time" type="threads:time" minOccurs="0" maxOccurs="1" />
+                    </xs:sequence>
+                    <xs:attribute name="name" type="xs:string" use="required" />
+                    <xs:attribute name="max-threads" type="xs:int" use="optional"/>
+                    <xs:attribute name="thread-factory" type="xs:string" use="optional" />
+                </xs:complexType>
+            </xs:element>
             <xs:element name="bindings-directory" maxOccurs="1" minOccurs="0" type="directoryType" />
             <xs:element name="journal-directory" maxOccurs="1" minOccurs="0" type="directoryType" />
             <xs:element name="large-messages-directory" maxOccurs="1" minOccurs="0" type="directoryType" />

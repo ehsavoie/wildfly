@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -115,6 +117,10 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
     private final Optional<Supplier<SecurityDomain>> elytronSecurityDomain;
     // Supplier for legacy SecurityDomainContext
     private final Optional<Supplier<SecurityDomainContext>> securityDomainContext;
+    // Supplier for Thread pools
+    private final Optional<Supplier<ExecutorService>> threadPool;
+    private final Optional<Supplier<ScheduledExecutorService>> scheduledThreadPool;
+    private final Optional<Supplier<ExecutorService>> ioThreadPool;
 
     // credential source injectors
     private Map<String, InjectedValue<ExceptionSupplier<CredentialSource, Exception>>> bridgeCredentialSource = new HashMap<>();
@@ -133,7 +139,10 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
                                  Optional<Supplier<SecurityDomain>> elytronSecurityDomain,
                                  Optional<Supplier<SecurityDomainContext>> securityDomainContext,
                                  Optional<Supplier<MBeanServer>> mbeanServer,
-                                 Optional<Supplier<DataSource>> dataSource) {
+                                 Optional<Supplier<DataSource>> dataSource,
+                                 Optional<Supplier<ExecutorService>> threadPool,
+                                 Optional<Supplier<ScheduledExecutorService>> scheduledThreadPool,
+                                 Optional<Supplier<ExecutorService>> ioThreadPool) {
         this.configuration = configuration;
         this.pathConfig = pathConfig;
         this.dataSource = dataSource;
@@ -153,6 +162,9 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
                 bridgeCredentialSource.put(bridgeConfiguration.getName(), new InjectedValue<>());
             }
         }
+        this.threadPool = threadPool;
+        this.scheduledThreadPool = scheduledThreadPool;
+        this.ioThreadPool = ioThreadPool;
     }
 
     public synchronized void start(final StartContext context) throws StartException {
@@ -276,7 +288,6 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
             }
 
             final MBeanServer mbs = mbeanServer.isPresent() ? mbeanServer.get().get() : null;
-
             // Now start the server
             server = new ActiveMQServerImpl(configuration,
                     mbs,
@@ -291,7 +302,15 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
             for (Interceptor outgoingInterceptor : outgoingInterceptors) {
                 server.getServiceRegistry().addOutgoingInterceptor(outgoingInterceptor);
             }
-
+            if(this.threadPool.isPresent()) {
+                 server.getServiceRegistry().setExecutorService(this.threadPool.get().get());
+            }
+            if(this.scheduledThreadPool.isPresent()) {
+                 server.getServiceRegistry().setScheduledExecutorService(this.scheduledThreadPool.get().get());
+            }
+            if(this.ioThreadPool.isPresent()) {
+                 server.getServiceRegistry().setIOExecutorService(this.ioThreadPool.get().get());
+            }
             // the server is actually started by the JMSService.
         } catch (Exception e) {
             throw MessagingLogger.ROOT_LOGGER.failedToStartService(e);

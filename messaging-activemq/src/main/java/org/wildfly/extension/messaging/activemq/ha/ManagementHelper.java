@@ -62,7 +62,7 @@ public class ManagementHelper {
         };
     }
 
-    static OperationStepHandler checkNoOtherSibling(final String childType) {
+    public static OperationStepHandler checkNoOtherSibling(final String childType) {
         return new OperationStepHandler() {
             @Override
             public void execute(OperationContext context, ModelNode operation) throws OperationFailedException {

@@ -3,6 +3,24 @@
 <config default-supplement="default">
     <extension-module>org.wildfly.extension.messaging-activemq</extension-module>
     <subsystem xmlns="urn:jboss:domain:messaging-activemq:6.0">
+        <thread-factory name="server-thread-factory"
+                        group-name="ActiveMQ-server"/>
+        <thread-factory name="server-scheduled-thread-factory"
+                        group-name="ActiveMQ-scheduled-threads"/>
+        <thread-factory name="server-io-thread-factory"
+                        group-name="ActiveMQ-IO-server"/>
+        <thread-factory name="global-client-thread-factory"
+                        group-name="ActiveMQ-client-global-threads"/>
+        <thread-factory name="global-client-scheduled-thread-factory"
+                        group-name="ActiveMQ-client-global-scheduled-threads"/>
+
+        <thread-pool name="global-client" max-threads="${prop.max-thread-count:10}" thread-factory="global-client-thread-factory">
+            <keepalive-time time="60" unit="seconds"/>
+        </thread-pool>
+
+        <scheduled-thread-pool name="global-client" max-threads="${prop.max-thread-count:5}" thread-factory="global-client-scheduled-thread-factory">
+            <keepalive-time time="60" unit="seconds"/>
+        </scheduled-thread-pool>
 
         <server name="default">
 

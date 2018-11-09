@@ -142,16 +142,15 @@ public abstract class BuildConfigurationTestBase {
         try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
             List<String> lines = Files.readAllLines(domainConfigFile.toPath(), StandardCharsets.UTF_8);
             for (String line : lines) {
-                if (line.contains("<security-setting name=\"#\">")) { //super duper hackish, just IO optimization
-                    writer.write("        <journal type=\"NIO\" file-size=\"1024\" />");
-                    writer.newLine();
-                }
-
                 int start = line.indexOf("java.net.preferIPv4Stack");
                 if (start < 0) {
                     writer.write(line);
                 }
                 writer.newLine();
+                if (line.contains("<statistics enabled=\"${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}\"/>")) { //super duper hackish, just IO optimization
+                    writer.write("        <journal type=\"NIO\" file-size=\"1024\" />");
+                    writer.newLine();
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

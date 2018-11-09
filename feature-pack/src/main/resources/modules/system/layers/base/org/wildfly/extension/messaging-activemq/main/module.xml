@@ -45,6 +45,7 @@
         <module name="org.apache.activemq.artemis"/>
         <module name="org.apache.activemq.artemis.ra"/>
         <module name="org.jboss.common-beans"/>
+        <module name="org.jboss.as.threads"/>
         <module name="org.jboss.staxmapper"/>
         <!-- required to provide high-level JMS CLI commands loaded by the extension -->
         <module name="org.jboss.as.cli" optional="true"/>

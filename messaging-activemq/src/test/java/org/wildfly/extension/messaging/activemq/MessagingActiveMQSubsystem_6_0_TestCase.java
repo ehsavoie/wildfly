@@ -177,6 +177,9 @@ public class MessagingActiveMQSubsystem_6_0_TestCase extends AbstractSubsystemBa
         PathAddress subsystemAddress = PathAddress.pathAddress(SUBSYSTEM_PATH);
 
         FailedOperationTransformationConfig config = new FailedOperationTransformationConfig();
+        config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, ThreadPools.JOURNAl_THREAD_POOL_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
+        config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, ThreadPools.SCHEDULED_THREAD_POOL_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
+        config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, ThreadPools.THREAD_POOL_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
         if (messagingVersion.equals(MessagingExtension.VERSION_1_0_0)) {
             config.addFailedAttribute(subsystemAddress,
                         new FailedOperationTransformationConfig.NewAttributesConfig(
@@ -252,7 +255,7 @@ public class MessagingActiveMQSubsystem_6_0_TestCase extends AbstractSubsystemBa
                         new FailedOperationTransformationConfig.NewAttributesConfig(
                                 ConnectionFactoryAttributes.Common.INITIAL_MESSAGE_PACKET_SIZE));
         } else {
-        config.addFailedAttribute(subsystemAddress.append(SERVER_PATH),
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH),
                     new FailedOperationTransformationConfig.NewAttributesConfig(
                             ServerDefinition.GLOBAL_MAX_DISK_USAGE,
                             ServerDefinition.DISK_SCAN_PERIOD,
@@ -269,6 +272,9 @@ public class MessagingActiveMQSubsystem_6_0_TestCase extends AbstractSubsystemBa
         config.addFailedAttribute(subsystemAddress.append(POOLED_CONNECTION_FACTORY_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
         config.addFailedAttribute(subsystemAddress.append(EXTERNAL_JMS_QUEUE_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
         config.addFailedAttribute(subsystemAddress.append(EXTERNAL_JMS_TOPIC_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
+        config.addFailedAttribute(subsystemAddress.append(ThreadPools.SCHEDULED_THREAD_POOL_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
+        config.addFailedAttribute(subsystemAddress.append(ThreadPools.THREAD_FACTORY_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
+        config.addFailedAttribute(subsystemAddress.append(ThreadPools.THREAD_POOL_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
 
         ModelTestUtils.checkFailedTransformedBootOperations(mainServices, messagingVersion, ops, config);
     }

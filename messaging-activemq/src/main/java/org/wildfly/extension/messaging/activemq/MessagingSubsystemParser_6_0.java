@@ -31,6 +31,7 @@ import static org.wildfly.extension.messaging.activemq.CommonAttributes.IN_VM_CO
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.REMOTE_ACCEPTOR;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.REMOTE_CONNECTOR;
 
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PersistentResourceXMLDescription;
 import org.jboss.as.controller.PersistentResourceXMLDescription.PersistentResourceXMLBuilder;
 import org.jboss.as.controller.PersistentResourceXMLParser;
@@ -77,6 +78,18 @@ public class MessagingSubsystemParser_6_0 extends PersistentResourceXMLParser {
                 .addAttributes(
                         RemoteTransportDefinition.SOCKET_BINDING,
                         CommonAttributes.PARAMS);
+
+         final PersistentResourceXMLBuilder threadFactory = builder(ThreadPools.THREAD_FACTORY_PATH)
+                .addAttributes(ThreadPools.THREAD_FACTORY.getAttributes().toArray(new AttributeDefinition[3]));
+
+         final PersistentResourceXMLBuilder threadPool = builder(ThreadPools.THREAD_POOL_PATH)
+                .addAttributes(ThreadPools.THREAD_POOL.getAttributes().toArray(new AttributeDefinition[3]));
+
+         final PersistentResourceXMLBuilder scheduledThreadPool = builder(ThreadPools.SCHEDULED_THREAD_POOL_PATH)
+                .addAttributes(ThreadPools.SCHEDULED_THREAD_POOL.getAttributes().toArray(new AttributeDefinition[3]));
+
+         final PersistentResourceXMLBuilder ioThreadPool = builder(ThreadPools.JOURNAL_THREAD_POOL)
+                .addAttributes(ThreadPools.JOURNAL_THREAD_POOL.getAttributes().toArray(new AttributeDefinition[3]));
 
         final PersistentResourceXMLBuilder httpConnector = builder(MessagingExtension.HTTP_CONNECTOR_PATH)
                 .addAttributes(
@@ -165,6 +178,9 @@ public class MessagingSubsystemParser_6_0 extends PersistentResourceXMLParser {
                 .addAttributes(
                         MessagingSubsystemRootResourceDefinition.GLOBAL_CLIENT_THREAD_POOL_MAX_SIZE,
                         MessagingSubsystemRootResourceDefinition.GLOBAL_CLIENT_SCHEDULED_THREAD_POOL_MAX_SIZE)
+                .addChild(threadFactory)
+                .addChild(threadPool)
+                .addChild(scheduledThreadPool)
                 .addChild(httpConnector)
                 .addChild(remoteConnector)
                 .addChild(invmConnector)
@@ -262,6 +278,9 @@ public class MessagingSubsystemParser_6_0 extends PersistentResourceXMLParser {
                                         ServerDefinition.MEMORY_WARNING_THRESHOLD,
                                         CommonAttributes.INCOMING_INTERCEPTORS,
                                         CommonAttributes.OUTGOING_INTERCEPTORS)
+                                .addChild(ioThreadPool)
+                                .addChild(threadPool)
+                                .addChild(scheduledThreadPool)
                                 .addChild(
                                         builder(LiveOnlyDefinition.INSTANCE.getPathElement())
                                                 .addAttributes(

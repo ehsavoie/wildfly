@@ -858,4 +858,9 @@ public interface MessagingLogger extends BasicLogger {
 
     @Message(id = 98, value = "Unable to load module %s - the module or one of its dependencies is missing [%s]")
     OperationFailedException moduleNotFound(String moduleName, String missingModule, @Cause ModuleNotFoundException e);
+
+    @LogMessage(level = WARN)
+    @Message(id = 99, value = "The attribute %s won't be used as a thread pool '%s' is configured instead.")
+    void settingThreadMaxSizeAndThreadPools(String attribute, String resource);
+
 }

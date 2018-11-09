@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature-group-spec name="messaging-activemq" xmlns="urn:jboss:galleon:feature-group:1.0">
     <feature spec="subsystem.messaging-activemq">
+        <feature spec="subsystem.messaging-activemq.thread-factory">
+            <param name="thread-factory" value="server-thread-factory"/>
+            <param name="group-name" value="ActiveMQ-server-default"/>
+            <param name="thread-name-pattern" value="%G %t" />
+        </feature>
+        <feature spec="subsystem.messaging-activemq.thread-factory">
+            <param name="thread-factory" value="server-scheduled-thread-factory"/>
+            <param name="group-name" value="ActiveMQ-scheduled-threads"/>
+            <param name="thread-name-pattern" value="%G %t" />
+        </feature>
+        <feature spec="subsystem.messaging-activemq.thread-factory">
+            <param name="thread-factory" value="journal-server-thread-factory"/>
+            <param name="group-name" value="ActiveMQ-IO-server-default"/>
+            <param name="thread-name-pattern" value="%G %t" />
+        </feature>
+        <feature spec="subsystem.messaging-activemq.thread-factory">
+            <param name="thread-factory" value="global-client-thread-factory"/>
+            <param name="group-name" value="ActiveMQ-client-global-threads"/>
+            <param name="thread-name-pattern" value="%G %t" />
+        </feature>
+        <feature spec="subsystem.messaging-activemq.thread-factory">
+            <param name="thread-factory" value="global-client-scheduled-thread-factory"/>
+            <param name="group-name" value="ActiveMQ-client-global-scheduled-threads"/>
+            <param name="thread-name-pattern" value="%G %t" />
+        </feature>
+        <feature spec="subsystem.messaging-activemq.thread-pool">
+            <param name="thread-pool" value="global-client"/>
+            <param name="thread-factory" value="global-client-thread-factory"/>
+            <param name="max-threads" value="10"/>
+            <feature spec="subsystem.messaging-activemq.thread-pool.keepalive-time">
+                <param name="time" value="60"/>
+                <param name="unit" value="seconds"/>
+            </feature>
+        </feature>
+        <feature spec="subsystem.messaging-activemq.scheduled-thread-pool">
+            <param name="scheduled-thread-pool" value="global-client"/>
+            <param name="thread-factory" value="global-client-scheduled-thread-factory"/>
+            <param name="max-threads" value="5"/>
+            <feature spec="subsystem.messaging-activemq.scheduled-thread-pool.keepalive-time">
+                <param name="time" value="60"/>
+                <param name="unit" value="seconds"/>
+            </feature>
+        </feature>
         <feature spec="subsystem.messaging-activemq.server">
             <param name="server" value="default"/>
             <param name="statistics-enabled" value="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
@@ -75,6 +118,33 @@
                 <param name="max-size-bytes" value="10485760"/>
                 <param name="page-size-bytes" value="2097152"/>
                 <param name="message-counter-history-day-limit" value="10"/>
+            </feature>
+            <feature spec="subsystem.messaging-activemq.server.journal-thread-pool">
+                <param name="journal-thread-pool" value="server"/>
+                <param name="thread-factory" value="journal-server-thread-factory"/>
+                <param name="max-threads" value="10"/>
+                <feature spec="subsystem.messaging-activemq.server.journal-thread-pool.keepalive-time">
+                    <param name="time" value="60"/>
+                    <param name="unit" value="seconds"/>
+                </feature>
+            </feature>
+            <feature spec="subsystem.messaging-activemq.server.thread-pool">
+                <param name="thread-pool" value="server"/>
+                <param name="thread-factory" value="server-thread-factory"/>
+                <param name="max-threads" value="10"/>
+                <feature spec="subsystem.messaging-activemq.server.thread-pool.keepalive-time">
+                    <param name="time" value="60"/>
+                    <param name="unit" value="seconds"/>
+                </feature>
+            </feature>
+            <feature spec="subsystem.messaging-activemq.server.scheduled-thread-pool">
+                <param name="scheduled-thread-pool" value="server"/>
+                <param name="thread-factory" value="server-scheduled-thread-factory"/>
+                <param name="max-threads" value="5"/>
+                <feature spec="subsystem.messaging-activemq.server.scheduled-thread-pool.keepalive-time">
+                    <param name="time" value="60"/>
+                    <param name="unit" value="seconds"/>
+                </feature>
             </feature>
         </feature>
     </feature>

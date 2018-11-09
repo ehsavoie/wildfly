@@ -90,7 +90,14 @@ import static org.wildfly.extension.messaging.activemq.CommonAttributes.EXTERNAL
  * Domain extension that integrates Apache ActiveMQ 6.
  *
  * <dl>
- * <dt><strong>Current</strong> - WildFly 15</dt>
+ * <dt><strong>Current</strong> - WildFly 16</dt>
+ *   <dd>
+ *     <ul>
+ *       <li>XML namespace: urn:jboss:domain:messaging-activemq:6.0
+ *       <li>Management model: 6.0.0
+ *     </ul>
+ *   </dd>
+ * <dt>WildFly 15</dt>
  *   <dd>
  *     <ul>
  *       <li>XML namespace: urn:jboss:domain:messaging-activemq:5.0
@@ -218,6 +225,11 @@ public class MessagingExtension implements Extension {
         // Root resource
         final ManagementResourceRegistration subsystem = subsystemRegistration.registerSubsystemModel(MessagingSubsystemRootResourceDefinition.INSTANCE);
         subsystem.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
+
+        //Thread pools
+        subsystem.registerSubModel(ThreadPools.THREAD_FACTORY);
+        subsystem.registerSubModel(ThreadPools.CLIENT_SCHEDULED_THREAD_POOL);
+        subsystem.registerSubModel(ThreadPools.CLIENT_THREAD_POOL);
 
         // WFLY-10518 - register new client resources under subsystem
         subsystem.registerSubModel(new DiscoveryGroupDefinition(registerRuntimeOnly, true));
