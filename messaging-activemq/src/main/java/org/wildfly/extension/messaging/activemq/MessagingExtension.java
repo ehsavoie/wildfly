@@ -84,6 +84,8 @@ import org.wildfly.extension.messaging.activemq.jms.bridge.JMSBridgeDefinition;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.EXTERNAL_JMS_QUEUE;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.EXTERNAL_JMS_TOPIC;
 
+import org.wildfly.extension.messaging.activemq.jms.ExternalPooledConnectionFactoryDefinition;
+
 /**
  * Domain extension that integrates Apache ActiveMQ 6.
  *
@@ -222,9 +224,9 @@ public class MessagingExtension implements Extension {
         subsystem.registerSubModel(RemoteTransportDefinition.createConnectorDefinition(registerRuntimeOnly));
         subsystem.registerSubModel(new HTTPConnectorDefinition(registerRuntimeOnly));
         subsystem.registerSubModel(new ExternalConnectionFactoryDefinition(registerRuntimeOnly));
-        subsystem.registerSubModel(PooledConnectionFactoryDefinition.INSTANCE);
-        subsystem.registerSubModel(ExternalJMSQueueDefinition.INSTANCE);
-        subsystem.registerSubModel(ExternalJMSTopicDefinition.INSTANCE);
+        subsystem.registerSubModel(ExternalPooledConnectionFactoryDefinition.INSTANCE);
+        subsystem.registerSubModel(new ExternalJMSQueueDefinition(registerRuntimeOnly));
+        subsystem.registerSubModel(new ExternalJMSTopicDefinition(registerRuntimeOnly));
 
         // ActiveMQ Servers
         final ManagementResourceRegistration server = subsystem.registerSubModel(new ServerDefinition(registerRuntimeOnly));
@@ -244,6 +246,10 @@ public class MessagingExtension implements Extension {
         if (registerRuntimeOnly) {
             final ManagementResourceRegistration deployment = subsystemRegistration.registerDeploymentModel(new SimpleResourceDefinition(
                     new Parameters(SUBSYSTEM_PATH, getResourceDescriptionResolver("deployed")).setFeature(false)));
+            deployment.registerSubModel(new ExternalConnectionFactoryDefinition(registerRuntimeOnly));
+            deployment.registerSubModel(ExternalPooledConnectionFactoryDefinition.DEPLOYMENT_INSTANCE);
+            deployment.registerSubModel(new ExternalJMSQueueDefinition(registerRuntimeOnly));
+            deployment.registerSubModel(new ExternalJMSTopicDefinition(registerRuntimeOnly));
             final ManagementResourceRegistration deployedServer = deployment.registerSubModel(new SimpleResourceDefinition(
                     new Parameters(SERVER_PATH, getResourceDescriptionResolver(SERVER)).setFeature(false)));
             deployedServer.registerSubModel(new JMSQueueDefinition(true, registerRuntimeOnly));
