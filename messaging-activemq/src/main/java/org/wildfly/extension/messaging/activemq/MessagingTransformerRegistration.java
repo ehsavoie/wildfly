@@ -70,6 +70,7 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
     public void registerTransformers(SubsystemTransformerRegistration registration) {
         ChainedTransformationDescriptionBuilder builder = TransformationDescriptionBuilder.Factory.createChainedSubystemInstance(registration.getCurrentSubsystemVersion());
 
+        registerTransformers_WF_17(builder.createBuilder(MessagingExtension.VERSION_7_0_0, MessagingExtension.VERSION_6_0_0));
         registerTransformers_WF_16(builder.createBuilder(MessagingExtension.VERSION_6_0_0, MessagingExtension.VERSION_5_0_0));
         registerTransformers_WF_15(builder.createBuilder(MessagingExtension.VERSION_5_0_0, MessagingExtension.VERSION_4_0_0));
         registerTransformers_EAP_7_2_0(builder.createBuilder(MessagingExtension.VERSION_4_0_0, MessagingExtension.VERSION_3_0_0));
@@ -77,9 +78,13 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
         registerTransformers_EAP_7_0_0(builder.createBuilder(MessagingExtension.VERSION_2_0_0, MessagingExtension.VERSION_1_0_0));
 
         builder.buildAndRegister(registration, new ModelVersion[] { MessagingExtension.VERSION_1_0_0, MessagingExtension.VERSION_2_0_0,
-            MessagingExtension.VERSION_3_0_0, MessagingExtension.VERSION_4_0_0, MessagingExtension.VERSION_5_0_0});
+            MessagingExtension.VERSION_3_0_0, MessagingExtension.VERSION_4_0_0, MessagingExtension.VERSION_5_0_0, MessagingExtension.VERSION_6_0_0});
     }
-private static void registerTransformers_WF_16(ResourceTransformationDescriptionBuilder subsystem) {
+
+    private static void registerTransformers_WF_17(ResourceTransformationDescriptionBuilder subsystem) {
+    }
+
+    private static void registerTransformers_WF_16(ResourceTransformationDescriptionBuilder subsystem) {
         ResourceTransformationDescriptionBuilder queue = subsystem.addChildResource(SERVER_PATH).addChildResource(QUEUE_PATH);
         rejectDefinedAttributeWithDefaultValue(queue, QueueDefinition.ROUTING_TYPE);
 
@@ -90,6 +95,7 @@ private static void registerTransformers_WF_16(ResourceTransformationDescription
         defaultValueAttributeConverter(jmsBridge, JMSBridgeDefinition.MAX_BATCH_SIZE);
         defaultValueAttributeConverter(jmsBridge, JMSBridgeDefinition.MAX_BATCH_TIME);
     }
+
     private static void registerTransformers_WF_15(ResourceTransformationDescriptionBuilder subsystem) {
         ResourceTransformationDescriptionBuilder server = subsystem.addChildResource(MessagingExtension.SERVER_PATH);
         // WFLY-10976 - journal-pool-files default value is 10.
