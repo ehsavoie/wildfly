@@ -158,7 +158,8 @@ public class MessagingSubsystemParser_7_0 extends PersistentResourceXMLParser {
                                                         ConnectionFactoryAttributes.Pooled.ENLISTMENT_TRACE,
                                                         ConnectionFactoryAttributes.Common.INITIAL_MESSAGE_PACKET_SIZE,
                                                         ConnectionFactoryAttributes.Pooled.INITIAL_CONNECT_ATTEMPTS,
-                                                        ConnectionFactoryAttributes.Pooled.STATISTICS_ENABLED);
+                                                        ConnectionFactoryAttributes.Pooled.STATISTICS_ENABLED,
+                                                        ConnectionFactoryAttributes.Common.USE_TOPOLOGY);
 
         return builder(MessagingExtension.SUBSYSTEM_PATH, NAMESPACE)
                 .addAttributes(
@@ -175,7 +176,8 @@ public class MessagingSubsystemParser_7_0 extends PersistentResourceXMLParser {
                                 ConnectionFactoryAttributes.Regular.FACTORY_TYPE,
                                 ConnectionFactoryAttributes.Common.DISCOVERY_GROUP,
                                 ConnectionFactoryAttributes.Common.CONNECTORS,
-                                ConnectionFactoryAttributes.Common.ENTRIES
+                                ConnectionFactoryAttributes.Common.ENTRIES,
+                                ConnectionFactoryAttributes.Common.USE_TOPOLOGY
                                 ))
                 .addChild(pooledConnectionFactory)
                 .addChild(builder(MessagingExtension.EXTERNAL_JMS_QUEUE_PATH)
@@ -586,7 +588,8 @@ public class MessagingSubsystemParser_7_0 extends PersistentResourceXMLParser {
                                                         ConnectionFactoryAttributes.Common.DESERIALIZATION_WHITELIST,
                                                         ConnectionFactoryAttributes.Common.INITIAL_MESSAGE_PACKET_SIZE,
                                                         // regular
-                                                        ConnectionFactoryAttributes.Regular.FACTORY_TYPE))
+                                                        ConnectionFactoryAttributes.Regular.FACTORY_TYPE,
+                                                        ConnectionFactoryAttributes.Common.USE_TOPOLOGY))
                                 .addChild(
                                         builder(LegacyConnectionFactoryDefinition.INSTANCE.getPathElement())
                                                 .addAttributes(
