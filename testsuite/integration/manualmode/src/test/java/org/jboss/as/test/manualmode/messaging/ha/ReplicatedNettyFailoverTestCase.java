@@ -61,7 +61,7 @@ public class ReplicatedNettyFailoverTestCase extends FailoverTestCase {
         execute(client, operation);
 
         jmsOperations.createJmsQueue(jmsQueueName, "java:jboss/exported/" + jmsQueueLookup);
-        jmsOperations.enableMessagingTraces();
+//        jmsOperations.enableMessagingTraces();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ReplicatedNettyFailoverTestCase extends FailoverTestCase {
         execute(client, operation);
 
         jmsOperations.createJmsQueue(jmsQueueName, "java:jboss/exported/" + jmsQueueLookup);
-        jmsOperations.enableMessagingTraces();
+//        jmsOperations.enableMessagingTraces();
     }
 
     @Override
