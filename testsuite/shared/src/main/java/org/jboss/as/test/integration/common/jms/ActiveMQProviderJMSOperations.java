@@ -337,14 +337,14 @@ public class ActiveMQProviderJMSOperations implements JMSOperations {
         }
         executeOperation(address, ADD, attributes);
 
-        address = PathAddress.parseCLIStyleAddress("/subsystem=logging/logger=org.apache.activemq.artemis.core.protocol.core.ServerSessionPacketHandler").toModelNode();
+        address = PathAddress.parseCLIStyleAddress("/subsystem=logging/logger=org.jboss.as.test").toModelNode();
         try {
             executeOperation(address, REMOVE_OPERATION, null);
         } catch (Exception e) {
         }
         executeOperation(address, ADD, attributes);
 
-        address = PathAddress.parseCLIStyleAddress("/subsystem=logging/logger=org.apache.activemq.artemis.core.protocol.core.impl.ChannelImpl").toModelNode();
+        address = PathAddress.parseCLIStyleAddress("/subsystem=logging/logger=org.apache.activemq.artemis").toModelNode();
         try {
             executeOperation(address, REMOVE_OPERATION, null);
         } catch (Exception e) {

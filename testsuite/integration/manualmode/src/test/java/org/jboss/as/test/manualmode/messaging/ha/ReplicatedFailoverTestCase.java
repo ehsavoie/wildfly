@@ -58,7 +58,7 @@ public class ReplicatedFailoverTestCase extends FailoverTestCase {
 
         JMSOperations jmsOperations = JMSOperationsProvider.getInstance(client);
         jmsOperations.createJmsQueue(jmsQueueName, "java:jboss/exported/" + jmsQueueLookup);
-//        jmsOperations.enableMessagingTraces();
+        jmsOperations.enableMessagingTraces();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ReplicatedFailoverTestCase extends FailoverTestCase {
 
         JMSOperations jmsOperations = JMSOperationsProvider.getInstance(client);
         jmsOperations.createJmsQueue(jmsQueueName, "java:jboss/exported/" + jmsQueueLookup);
-//        jmsOperations.enableMessagingTraces();
+        jmsOperations.enableMessagingTraces();
     }
 
     @Override

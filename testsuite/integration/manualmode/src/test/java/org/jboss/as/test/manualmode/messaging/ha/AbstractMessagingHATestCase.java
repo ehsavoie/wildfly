@@ -67,6 +67,7 @@ import org.jboss.as.test.shared.ServerReload;
 import org.jboss.as.test.shared.TestSuiteEnvironment;
 import org.jboss.as.test.shared.TimeoutUtil;
 import org.jboss.dmr.ModelNode;
+import org.jboss.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -81,6 +82,7 @@ public abstract class AbstractMessagingHATestCase {
 
     public static final String SERVER1 = "jbossas-messaging-ha-server1";
     public static final String SERVER2 = "jbossas-messaging-ha-server2";
+    private static final Logger log = Logger.getLogger(AbstractMessagingHATestCase.class);
 
     // maximum time for HornetQ activation to detect node failover/failback
     protected static int ACTIVATION_TIMEOUT = 30000;
@@ -171,8 +173,10 @@ public abstract class AbstractMessagingHATestCase {
     }
 
     protected static void sendMessage(Context ctx, String destinationLookup, String text) throws NamingException {
+        log.trace("Looking up for the RemoteConnectionFactory with " + ctx);
         ConnectionFactory cf = (ConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
         assertNotNull(cf);
+        log.trace("Looking up for the destination with " + ctx);
         Destination destination = (Destination) ctx.lookup(destinationLookup);
         assertNotNull(destination);
 
@@ -182,8 +186,10 @@ public abstract class AbstractMessagingHATestCase {
     }
 
     protected static void receiveMessage(Context ctx, String destinationLookup, String expectedText) throws NamingException {
+        log.trace("Looking up for the RemoteConnectionFactory with " + ctx);
         ConnectionFactory cf = (ConnectionFactory) ctx.lookup("jms/RemoteConnectionFactory");
         assertNotNull(cf);
+        log.trace("Looking up for the destination with " + ctx);
         Destination destination = (Destination) ctx.lookup(destinationLookup);
         assertNotNull(destination);
 
