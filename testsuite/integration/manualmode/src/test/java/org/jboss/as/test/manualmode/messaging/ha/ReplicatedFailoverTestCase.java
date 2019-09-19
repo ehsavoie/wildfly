@@ -48,6 +48,34 @@ public class ReplicatedFailoverTestCase extends FailoverTestCase {
 
     @Override
     protected void setUpServer1(ModelControllerClient client) throws Exception {
+        JMSOperations jmsOperations = JMSOperationsProvider.getInstance(client);
+        jmsOperations.removeJmsConnectionFactory("RemoteConnectionFactory");
+        jmsOperations.createSocketBinding("http-messaging", null, 7080);
+        jmsOperations.removeHttpConnector("http-connector");
+        jmsOperations.addHttpConnector("http-connector", "http-messaging", "http-acceptor", null);
+
+        ModelNode acceptorAddress = PathAddress.parseCLIStyleAddress("/subsystem=messaging-activemq/server=default/http-acceptor=http-acceptor").toModelNode();
+        execute(client, Operations.createRemoveOperation(acceptorAddress));
+        ModelNode op = Operations.createAddOperation(acceptorAddress);
+        op.get("http-listener").set("http-messaging");
+        execute(client, op);
+
+        ModelNode undertowAddress = PathAddress.parseCLIStyleAddress("/subsystem=undertow/server=messaging").toModelNode();
+        op = Operations.createAddOperation(undertowAddress);
+        execute(client, op);
+        undertowAddress = PathAddress.parseCLIStyleAddress("/subsystem=undertow/server=messaging/http-listener=http-messaging").toModelNode();
+        op = Operations.createAddOperation(undertowAddress);
+        op.get("socket-binding").set("http-messaging");
+        op.get("enable-http2").set(true);
+        execute(client, op);
+
+        ModelNode attributes = new ModelNode();
+        attributes.get("connectors").add("http-connector");
+        attributes.get("ha").set(true);
+        attributes.get("block-on-acknowledge").set(true);
+        attributes.get("reconnect-attempts").set(-1);
+        jmsOperations.addJmsConnectionFactory("RemoteConnectionFactory", "java:jboss/exported/jms/RemoteConnectionFactory", attributes);
+
         configureCluster(client);
 
         // /subsystem=messaging-activemq/server=default/ha-policy=replication-master:add(cluster-name=my-cluster, check-for-live-server=true)
@@ -56,13 +84,40 @@ public class ReplicatedFailoverTestCase extends FailoverTestCase {
         operation.get("check-for-live-server").set(true);
         execute(client, operation);
 
-        JMSOperations jmsOperations = JMSOperationsProvider.getInstance(client);
         jmsOperations.createJmsQueue(jmsQueueName, "java:jboss/exported/" + jmsQueueLookup);
-        jmsOperations.enableMessagingTraces();
+//        jmsOperations.enableMessagingTraces();
     }
 
     @Override
     protected void setUpServer2(ModelControllerClient client) throws Exception {
+        JMSOperations jmsOperations = JMSOperationsProvider.getInstance(client);
+        jmsOperations.removeJmsConnectionFactory("RemoteConnectionFactory");
+        jmsOperations.createSocketBinding("http-messaging", null, 7080);
+        jmsOperations.removeHttpConnector("http-connector");
+        jmsOperations.addHttpConnector("http-connector", "http-messaging", "http-acceptor", null);
+
+        ModelNode acceptorAddress = PathAddress.parseCLIStyleAddress("/subsystem=messaging-activemq/server=default/http-acceptor=http-acceptor").toModelNode();
+        execute(client, Operations.createRemoveOperation(acceptorAddress));
+        ModelNode op = Operations.createAddOperation(acceptorAddress);
+        op.get("http-listener").set("http-messaging");
+        execute(client, op);
+
+        ModelNode undertowAddress = PathAddress.parseCLIStyleAddress("/subsystem=undertow/server=messaging").toModelNode();
+        op = Operations.createAddOperation(undertowAddress);
+        execute(client, op);
+        undertowAddress = PathAddress.parseCLIStyleAddress("/subsystem=undertow/server=messaging/http-listener=http-messaging").toModelNode();
+        op = Operations.createAddOperation(undertowAddress);
+        op.get("socket-binding").set("http-messaging");
+        op.get("enable-http2").set(true);
+        execute(client, op);
+
+        ModelNode attributes = new ModelNode();
+        attributes.get("connectors").add("http-connector");
+        attributes.get("ha").set(true);
+        attributes.get("block-on-acknowledge").set(true);
+        attributes.get("reconnect-attempts").set(-1);
+        jmsOperations.addJmsConnectionFactory("RemoteConnectionFactory", "java:jboss/exported/jms/RemoteConnectionFactory", attributes);
+
         configureCluster(client);
 
         // /subsystem=messaging-activemq/server=default/ha-policy=replication-slave:add(cluster-name=my-cluster, restart-backup=true)
@@ -71,9 +126,8 @@ public class ReplicatedFailoverTestCase extends FailoverTestCase {
         operation.get("restart-backup").set(true);
         execute(client, operation);
 
-        JMSOperations jmsOperations = JMSOperationsProvider.getInstance(client);
         jmsOperations.createJmsQueue(jmsQueueName, "java:jboss/exported/" + jmsQueueLookup);
-        jmsOperations.enableMessagingTraces();
+//        jmsOperations.enableMessagingTraces();
     }
 
     @Override
