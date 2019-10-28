@@ -19,10 +19,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.wildfly.extension.microprofile.opentracing;
 
 import static org.jboss.as.weld.Capabilities.WELD_CAPABILITY_NAME;
+import static org.wildfly.extension.microprofile.opentracing.TracerConfigurationDefinition.TRACER_CAPABILITY;
 import static org.wildfly.extension.microprofile.opentracing.TracingExtensionLogger.ROOT_LOGGER;
 
 import org.jboss.as.controller.capability.CapabilityServiceSupport;
@@ -43,8 +43,12 @@ import org.wildfly.security.manager.WildFlySecurityManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jboss.msc.service.ServiceName;
+
+import static org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory.TRACER_CAPABILITY_NAME;
 
 public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
+
     @Override
     public void deploy(DeploymentPhaseContext deploymentPhaseContext) throws DeploymentUnitProcessingException {
         ROOT_LOGGER.processingDeployment();
@@ -66,6 +70,13 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
                     deploymentPhaseContext.getDeploymentUnit().getName(), WELD_CAPABILITY_NAME
             ));
         }
+        String tracerConfigurationName = getTracerConfiguration(deploymentPhaseContext);
+        if (tracerConfigurationName != null) {
+            if (!support.hasCapability(TRACER_CAPABILITY.getDynamicName(tracerConfigurationName))) {
+                throw new DeploymentUnitProcessingException(ROOT_LOGGER.deploymentRequiresCapability(deploymentUnit.getName(), TRACER_CAPABILITY_NAME));
+            }
+            setTracerName(deploymentUnit, tracerConfigurationName);
+        }
         setServiceName(deploymentUnit);
         addListeners(deploymentUnit);
     }
@@ -80,7 +91,8 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         ROOT_LOGGER.registeringTracerInitializer();
 
         ListenerMetaData listenerMetaData = new ListenerMetaData();
-        listenerMetaData.setListenerClass(TracerInitializer.class.getName());
+        listenerMetaData.setListenerClass(TracerInitializer.class
+                .getName());
 
         List<ListenerMetaData> listeners = jbossWebMetaData.getListeners();
         if (null == listeners) {
@@ -104,14 +116,44 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         addContextParameter(jbossWebMetaData, serviceNameContextParameter);
     }
 
+    private void setTracerName(DeploymentUnit deploymentUnit, String tracerConfigurationName) {
+        JBossWebMetaData jbossWebMetaData = getJBossWebMetaData(deploymentUnit);
+        if (null == jbossWebMetaData) {
+            // nothing to do here
+            return;
+        }
+        ParamValueMetaData serviceNameContextParameter = new ParamValueMetaData();
+        serviceNameContextParameter.setParamName(TracerInitializer.SMALLRYE_OPENTRACING_TRACER_CONFIGURATION);
+        serviceNameContextParameter.setParamValue(tracerConfigurationName);
+        addContextParameter(jbossWebMetaData, serviceNameContextParameter);
+    }
+
     private JBossWebMetaData getJBossWebMetaData(DeploymentUnit deploymentUnit) {
         WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         if (null == warMetaData) {
             // not a web deployment, nothing to do here...
             return null;
         }
-
         return warMetaData.getMergedJBossWebMetaData();
+    }
+
+    private String getTracerConfiguration(DeploymentPhaseContext deploymentPhaseContext) {
+        DeploymentUnit deploymentUnit = deploymentPhaseContext.getDeploymentUnit();
+        JBossWebMetaData jbossWebMetaData = getJBossWebMetaData(deploymentUnit);
+        if (null == jbossWebMetaData || null == jbossWebMetaData.getContextParams()) {
+            return null;
+        }
+        for (ParamValueMetaData param : jbossWebMetaData.getContextParams()) {
+            if (TracerInitializer.SMALLRYE_OPENTRACING_TRACER_CONFIGURATION.equals(param.getParamName())) {
+                return param.getParamValue();
+            }
+        }
+        for (ServiceName serviceName : deploymentPhaseContext.getServiceRegistry().getServiceNames()) {
+            if (serviceName.getCanonicalName().startsWith(TRACER_CAPABILITY_NAME)) {
+                return serviceName.getSimpleName();
+            }
+        }
+        return null;
     }
 
     private void addContextParameter(JBossWebMetaData jbossWebMetaData, ParamValueMetaData restEasyProvider) {

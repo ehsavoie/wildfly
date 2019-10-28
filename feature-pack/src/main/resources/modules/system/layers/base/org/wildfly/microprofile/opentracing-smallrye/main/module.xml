@@ -25,6 +25,11 @@
     </resources>
 
     <dependencies>
+        <module name="org.jboss.logging"/>
+        <module name="org.jboss.as.controller"/>
+        <module name="org.jboss.as.server"/>
+        <module name="org.wildfly.security.elytron"/>
+
         <module name="javax.api"/> <!-- for javax.naming -->
 
         <module name="javax.annotation.api"/>
@@ -35,7 +40,7 @@
         <module name="javax.servlet.api"/>
         <module name="javax.ws.rs.api"/>
 
-        <module name="io.jaegertracing.jaeger"/>
+        <!--<module name="io.jaegertracing.jaeger"/>-->
         <module name="io.opentracing.opentracing-api"/>
         <module name="io.opentracing.opentracing-noop"/>
         <module name="io.opentracing.opentracing-util"/>
@@ -47,7 +52,6 @@
         <module name="io.smallrye.opentracing"/>
 
         <module name="org.eclipse.microprofile.opentracing"/>
-        <module name="org.jboss.logging"/>
         <module name="org.jboss.resteasy.resteasy-jaxrs"/>
         <module name="org.eclipse.microprofile.config.api"/>
         <module name="io.smallrye.config"/>

@@ -58,11 +58,17 @@ public class SubsystemDefinition extends PersistentResourceDefinition {
             "io.opentracing.contrib.opentracing-interceptors",
     };
     protected SubsystemDefinition() {
-        super( new SimpleResourceDefinition.Parameters(SubsystemExtension.SUBSYSTEM_PATH, SubsystemExtension.getResourceDescriptionResolver(SubsystemExtension.SUBSYSTEM_NAME))
+        super( new SimpleResourceDefinition.Parameters(SubsystemExtension.SUBSYSTEM_PATH, SubsystemExtension.getResourceDescriptionResolver())
                 .setAddHandler(SubsystemAdd.INSTANCE)
                 .setRemoveHandler(ReloadRequiredRemoveStepHandler.INSTANCE)
                 .setCapabilities(OPENTRACING_CAPABILITY)
         );
+    }
+
+    @Override
+    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
+        super.registerChildren(resourceRegistration);
+        resourceRegistration.registerSubModel(new TracerConfigurationDefinition());
     }
 
     @Override

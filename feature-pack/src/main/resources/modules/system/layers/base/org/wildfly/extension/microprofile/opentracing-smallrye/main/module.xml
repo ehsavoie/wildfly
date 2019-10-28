@@ -39,6 +39,8 @@
         <module name="org.wildfly.security.elytron"/>
 
         <module name="javax.enterprise.api" />
+        <module name="io.opentracing.opentracing-api"/>
         <module name="org.wildfly.microprofile.opentracing-smallrye"/>
+        <module name="io.jaegertracing.jaeger"/>
     </dependencies>
 </module>

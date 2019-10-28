@@ -28,6 +28,7 @@ import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.ModelVersion;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceXMLParser;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
@@ -42,10 +43,17 @@ public class SubsystemExtension implements Extension {
     private static final String RESOURCE_NAME = SubsystemExtension.class.getPackage().getName() + ".LocalDescriptions";
 
     protected static final ModelVersion VERSION_1_0_0 = ModelVersion.create(1, 0, 0);
-    private static final ModelVersion CURRENT_MODEL_VERSION = VERSION_1_0_0;
+    protected static final ModelVersion VERSION_2_0_0 = ModelVersion.create(2, 0, 0);
+    private static final ModelVersion CURRENT_MODEL_VERSION = VERSION_2_0_0;
+
+    private static final PersistentResourceXMLParser PARSER = SubsytemParser_2_0.INSTANCE;
+    public static final String NAMESPACE =SubsytemParser_2_0.NAMESPACE;
 
     static ResourceDescriptionResolver getResourceDescriptionResolver(final String... keyPrefix) {
-        return getResourceDescriptionResolver(true, keyPrefix);
+        String[] prefixes = new String[keyPrefix.length + 1];
+        prefixes[0] = SUBSYSTEM_NAME;
+        System.arraycopy(keyPrefix, 0, prefixes, 1, keyPrefix.length);
+        return getResourceDescriptionResolver(false, prefixes);
     }
 
     static ResourceDescriptionResolver getResourceDescriptionResolver(final boolean useUnprefixedChildTypes, final String... keyPrefix) {
@@ -62,13 +70,15 @@ public class SubsystemExtension implements Extension {
     @Override
     public void initialize(ExtensionContext context) {
         final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, CURRENT_MODEL_VERSION);
-        subsystem.registerXMLElementWriter(SubsytemParser_1_0.INSTANCE);
+        subsystem.registerXMLElementWriter(PARSER);
 
         final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(new SubsystemDefinition());
         registration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
     }
 
+    @Override
     public void initializeParsers(ExtensionParsingContext context) {
-        context.setSubsystemXmlMapping(SUBSYSTEM_NAME, SubsytemParser_1_0.NAMESPACE, SubsytemParser_1_0.INSTANCE);
+        context.setSubsystemXmlMapping(SUBSYSTEM_NAME, SubsytemParser_1_0.NAMESPACE, SubsytemParser_1_0::new);
+        context.setSubsystemXmlMapping(SUBSYSTEM_NAME, NAMESPACE, PARSER);
     }
 }

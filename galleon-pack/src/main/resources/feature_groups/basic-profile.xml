@@ -88,7 +88,13 @@
     <feature spec="subsystem.jdr"/>
     <feature spec="subsystem.weld"/>
     <feature spec="subsystem.microprofile-config-smallrye"/>
-    <feature spec="subsystem.microprofile-opentracing-smallrye"/>
+    <feature spec="subsystem.microprofile-opentracing-smallrye">
+        <feature spec="subsystem.microprofile-opentracing-smallrye.tracer">
+            <param name="tracer" value="jaeger"/>
+            <param name="sampler-param" value="1"/>
+            <param name="sampler-type" value="const"/>
+        </feature>
+    </feature>
     <feature spec="subsystem.pojo"/>
     <feature spec="subsystem.sar"/>
     <feature-group name="mail"/>

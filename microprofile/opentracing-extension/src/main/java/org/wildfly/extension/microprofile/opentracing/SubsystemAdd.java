@@ -40,6 +40,7 @@ class SubsystemAdd extends AbstractBoottimeAddStepHandler {
     protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model) {
         TracingExtensionLogger.ROOT_LOGGER.activatingSubsystem();
         context.addStep(new AbstractDeploymentChainStep() {
+            @Override
             public void execute(DeploymentProcessorTarget processorTarget) {
                 processorTarget.addDeploymentProcessor(
                         SubsystemExtension.SUBSYSTEM_NAME,
