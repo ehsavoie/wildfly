@@ -29,6 +29,7 @@ import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SE
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_USER;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_ENDPOINT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.TRACEID_128BIT;
+import static org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory.TRACER_CAPABILITY_NAME;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,8 +39,8 @@ import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.capability.RuntimeCapability;
+import org.jboss.as.controller.registry.RuntimePackageDependency;
 
-import static org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory.TRACER_CAPABILITY_NAME;
 
 /**
  *
@@ -52,6 +53,7 @@ public class TracerConfigurationDefinition extends PersistentResourceDefinition 
             .build();
 
     public static final PathElement TRACER_CONFIGURATION_PATH = PathElement.pathElement("tracer");
+
     public static final AttributeDefinition[] ATTRIBUTES = {PROPAGATION, SAMPLER_TYPE, SAMPLER_PARAM,
         SAMPLER_MANAGER_HOST_PORT, SENDER_AGENT_HOST, SENDER_AGENT_PORT, SENDER_ENDPOINT, SENDER_AUTH_TOKEN,
         SENDER_AUTH_USER, SENDER_AUTH_PASSWORD, REPORTER_LOG_SPANS, REPORTER_FLUSH_INTERVAL, REPORTER_MAX_QUEUE_SIZE,
@@ -61,7 +63,8 @@ public class TracerConfigurationDefinition extends PersistentResourceDefinition 
         super(new SimpleResourceDefinition.Parameters(TRACER_CONFIGURATION_PATH, SubsystemExtension.getResourceDescriptionResolver("tracer"))
                 .setAddHandler(TracerConfigurationAddHandler.INSTANCE)
                 .setRemoveHandler(ReloadRequiredRemoveStepHandler.INSTANCE)
-                .setCapabilities(TRACER_CAPABILITY));
+                .setCapabilities(TRACER_CAPABILITY)
+                .setAdditionalPackages(RuntimePackageDependency.required("io.jaegertracing.jaeger")));
     }
 
     @Override

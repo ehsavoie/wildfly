@@ -75,6 +75,7 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
             if (!support.hasCapability(TRACER_CAPABILITY.getDynamicName(tracerConfigurationName))) {
                 throw new DeploymentUnitProcessingException(ROOT_LOGGER.deploymentRequiresCapability(deploymentUnit.getName(), TRACER_CAPABILITY_NAME));
             }
+            deploymentPhaseContext.getServiceTarget().addDependency(ServiceName.parse(TRACER_CAPABILITY.getDynamicName(tracerConfigurationName)));
             setTracerName(deploymentUnit, tracerConfigurationName);
         }
         setServiceName(deploymentUnit);
@@ -91,8 +92,7 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         ROOT_LOGGER.registeringTracerInitializer();
 
         ListenerMetaData listenerMetaData = new ListenerMetaData();
-        listenerMetaData.setListenerClass(TracerInitializer.class
-                .getName());
+        listenerMetaData.setListenerClass(TracerInitializer.class.getName());
 
         List<ListenerMetaData> listeners = jbossWebMetaData.getListeners();
         if (null == listeners) {

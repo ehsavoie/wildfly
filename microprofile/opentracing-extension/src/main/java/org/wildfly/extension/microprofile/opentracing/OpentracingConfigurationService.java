@@ -19,49 +19,48 @@ package org.wildfly.extension.microprofile.opentracing;
 
 import static org.wildfly.extension.microprofile.opentracing.TracerConfigurationDefinition.TRACER_CAPABILITY;
 
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 import org.jboss.msc.Service;
 import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfiguration;
+import org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory;
 
 /**
  *
  * @author Emmanuel Hugonnet (c) 2019 Red Hat, Inc.
  */
-public class OpentracingConfigurationService implements Service , Supplier<TracerConfiguration>{
+public class OpentracingConfigurationService implements Service {
 
     private final TracerConfiguration config;
+    private final Consumer<TracerConfiguration> consumer;
 
-    public OpentracingConfigurationService(TracerConfiguration config) {
+    public OpentracingConfigurationService(Consumer<TracerConfiguration> consumer, TracerConfiguration config) {
         this.config = config;
+        this.consumer = consumer;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
+        consumer.accept(config);
     }
 
     @Override
     public void stop(StopContext context) {
+        consumer.accept(null);
     }
 
-    public TracerConfiguration getConfig() {
-        return config;
-    }
 
     @SuppressWarnings("unchecked")
     public static final void installJaeger(ServiceTarget target, TracerConfiguration config, String tracerName) {
-        ServiceBuilder builder = target.addService(TRACER_CAPABILITY.getCapabilityServiceName(tracerName));
-        builder.setInstance(new OpentracingConfigurationService(config));
+        ServiceName serviceName = TRACER_CAPABILITY.getCapabilityServiceName(tracerName);
+        ServiceBuilder builder = target.addService(serviceName);
+        builder.setInstance(new OpentracingConfigurationService(WildFlyTracerFactory.registerTracer(serviceName), config));
         builder.install();
-    }
-
-    @Override
-    public TracerConfiguration get() {
-        return config;
     }
 }
