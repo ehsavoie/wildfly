@@ -19,6 +19,7 @@ import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleMapAttributeDefinition;
 import org.jboss.as.controller.StringListAttributeDefinition;
+import org.jboss.as.controller.client.helpers.MeasurementUnit;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfigurationConstants;
@@ -28,6 +29,7 @@ import org.wildfly.microprofile.opentracing.smallrye.TracerConfigurationConstant
  * @author Emmanuel Hugonnet (c) 2019 Red Hat, Inc.
  */
 public class TracerAttributes {
+
     public static final StringListAttributeDefinition PROPAGATION = StringListAttributeDefinition.Builder.of(TracerConfigurationConstants.PROPAGATION)
             .setAllowNullElement(false)
             .setRequired(false)
@@ -112,4 +114,47 @@ public class TracerAttributes {
 //            .setRestartAllServices()
 //            .setRequired(false)
 //            .build();
+    public static final SimpleAttributeDefinition ENDPOINT = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.ENDPOINT, ModelType.STRING, false)
+            .setAttributeGroup("sender-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition ENCODING = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.ENCODING, ModelType.STRING, true)
+            .setAllowedValues("JSON", "THRIFT", "PROTO3")
+            .setDefaultValue(new ModelNode("JSON"))
+            .setAttributeGroup("reporter-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition CONNECTION_TIMEOUT = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.CONNECTION_TIMEOUT, ModelType.INT, true)
+            .setDefaultValue(new ModelNode(10000))
+            .setMeasurementUnit(MeasurementUnit.MICROSECONDS)
+            .setAttributeGroup("reporter-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition READ_TIMEOUT = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.READ_TIMEOUT, ModelType.INT, true)
+            .setDefaultValue(new ModelNode(10000))
+            .setMeasurementUnit(MeasurementUnit.MICROSECONDS)
+            .setAttributeGroup("reporter-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition MAX_REQUEST = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.MAX_REQUEST, ModelType.INT, true)
+            .setDefaultValue(new ModelNode(64))
+            .setAttributeGroup("reporter-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition MESSAGE_MAX_BYTES = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.MESSAGE_MAX_BYTES, ModelType.INT, true)
+            .setDefaultValue(new ModelNode(5 * 1024 * 1024))
+            .setMeasurementUnit(MeasurementUnit.BYTES)
+            .setAttributeGroup("reporter-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition COMPRESSION = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.COMPRESSION, ModelType.BOOLEAN, true)
+            .setDefaultValue(ModelNode.TRUE)
+            .setAttributeGroup("reporter-configuration")
+            .setRestartAllServices()
+            .build();
+    public static final SimpleAttributeDefinition SAMPLER = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.SAMPLER, ModelType.DOUBLE, true)
+            .setDefaultValue(new ModelNode(1.0D))
+            .setAttributeGroup("sampler-configuration")
+            .setRestartAllServices()
+            .build();
 }

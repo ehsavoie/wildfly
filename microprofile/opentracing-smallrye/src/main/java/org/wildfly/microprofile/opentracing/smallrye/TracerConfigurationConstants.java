@@ -21,6 +21,7 @@ package org.wildfly.microprofile.opentracing.smallrye;
  */
 public class TracerConfigurationConstants {
 
+
     public static enum Type {
         JAEGER, ZIPKIN;
     }
@@ -44,4 +45,14 @@ public class TracerConfigurationConstants {
 
     public static final String TRACEID_128BIT = "tracer_id_128bit";
     public static final String TRACER_TAGS = "tags";
+
+
+    public static final String COMPRESSION = "compression";
+    public static final String CONNECTION_TIMEOUT = "connection-timeout";
+    public static final String ENCODING = "encoding";
+    public static final String ENDPOINT = "endpoint";
+    public static final String MAX_REQUEST = "max-request";
+    public static final String MESSAGE_MAX_BYTES = "message-max-bytes";
+    public static final String READ_TIMEOUT = "read-timeout";
+    public static final String SAMPLER = "sampler";
 }
