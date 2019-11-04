@@ -23,6 +23,7 @@
 package org.wildfly.extension.microprofile.opentracing;
 
 import static org.jboss.as.weld.Capabilities.WELD_CAPABILITY_NAME;
+import static org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory.TRACER_CAPABILITY_NAME;
 
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PersistentResourceDefinition;
@@ -43,8 +44,12 @@ public class SubsystemDefinition extends PersistentResourceDefinition {
             .addRequirements(WELD_CAPABILITY_NAME)
             .build();
 
+    public static final RuntimeCapability<Void> TRACER_CAPABILITY = RuntimeCapability.Builder
+            .of(TRACER_CAPABILITY_NAME, true, OpentracingConfigurationService.class)
+            .build();
+
     static final String[] MODULES = {
-            "io.jaegertracing.jaeger",
+//            "io.jaegertracing.jaeger",
             "io.opentracing.contrib.opentracing-tracerresolver",
             "io.opentracing.opentracing-api",
             "io.opentracing.opentracing-util",
@@ -68,7 +73,8 @@ public class SubsystemDefinition extends PersistentResourceDefinition {
     @Override
     public void registerChildren(ManagementResourceRegistration resourceRegistration) {
         super.registerChildren(resourceRegistration);
-        resourceRegistration.registerSubModel(new TracerConfigurationDefinition());
+        resourceRegistration.registerSubModel(new JaegerTracerConfigurationDefinition());
+        resourceRegistration.registerSubModel(new ZipkinTracerConfigurationDefinition());
     }
 
     @Override

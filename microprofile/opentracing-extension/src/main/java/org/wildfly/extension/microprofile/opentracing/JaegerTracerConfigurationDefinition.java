@@ -46,22 +46,22 @@ import org.jboss.as.controller.registry.RuntimePackageDependency;
  *
  * @author Emmanuel Hugonnet (c) 2019 Red Hat, Inc.
  */
-public class TracerConfigurationDefinition extends PersistentResourceDefinition {
+public class JaegerTracerConfigurationDefinition extends PersistentResourceDefinition {
 
     public static final RuntimeCapability<Void> TRACER_CAPABILITY = RuntimeCapability.Builder
             .of(TRACER_CAPABILITY_NAME, true, OpentracingConfigurationService.class)
             .build();
 
-    public static final PathElement TRACER_CONFIGURATION_PATH = PathElement.pathElement("tracer");
+    public static final PathElement TRACER_CONFIGURATION_PATH = PathElement.pathElement("jaeger-tracer");
 
     public static final AttributeDefinition[] ATTRIBUTES = {PROPAGATION, SAMPLER_TYPE, SAMPLER_PARAM,
         SAMPLER_MANAGER_HOST_PORT, SENDER_AGENT_HOST, SENDER_AGENT_PORT, SENDER_ENDPOINT, SENDER_AUTH_TOKEN,
         SENDER_AUTH_USER, SENDER_AUTH_PASSWORD, REPORTER_LOG_SPANS, REPORTER_FLUSH_INTERVAL, REPORTER_MAX_QUEUE_SIZE,
         TRACEID_128BIT};
 
-    public TracerConfigurationDefinition() {
+    public JaegerTracerConfigurationDefinition() {
         super(new SimpleResourceDefinition.Parameters(TRACER_CONFIGURATION_PATH, SubsystemExtension.getResourceDescriptionResolver("tracer"))
-                .setAddHandler(TracerConfigurationAddHandler.INSTANCE)
+                .setAddHandler(JaegerTracerConfigurationAddHandler.INSTANCE)
                 .setRemoveHandler(ReloadRequiredRemoveStepHandler.INSTANCE)
                 .setCapabilities(TRACER_CAPABILITY)
                 .setAdditionalPackages(RuntimePackageDependency.required("io.jaegertracing.jaeger")));

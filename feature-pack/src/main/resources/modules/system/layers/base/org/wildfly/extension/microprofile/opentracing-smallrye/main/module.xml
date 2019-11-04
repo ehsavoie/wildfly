@@ -41,6 +41,7 @@
         <module name="javax.enterprise.api" />
         <module name="io.opentracing.opentracing-api"/>
         <module name="org.wildfly.microprofile.opentracing-smallrye"/>
-        <module name="io.jaegertracing.jaeger"/>
+        <module name="io.jaegertracing.jaeger" optional="true"/>
+        <module name="io.zipkin.brave" optional="true"/>
     </dependencies>
 </module>

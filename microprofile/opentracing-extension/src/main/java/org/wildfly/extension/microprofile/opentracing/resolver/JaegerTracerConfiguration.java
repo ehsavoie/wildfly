@@ -114,4 +114,9 @@ public class JaegerTracerConfiguration implements TracerConfiguration {
                 .withTraceId128Bit(traceId128Bit)
                 .withTracerTags(tracerTags).getTracer();
     }
+
+    @Override
+    public String getModuleName() {
+        return "io.jaegertracing.jaeger";
+    }
 }

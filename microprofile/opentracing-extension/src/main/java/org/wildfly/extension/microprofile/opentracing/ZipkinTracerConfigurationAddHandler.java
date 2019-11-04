@@ -15,33 +15,32 @@
  */
 package org.wildfly.extension.microprofile.opentracing;
 
-import static org.wildfly.extension.microprofile.opentracing.TracerConfigurationDefinition.ATTRIBUTES;
-import static org.wildfly.extension.microprofile.opentracing.TracerConfigurationDefinition.TRACER_CAPABILITY;
+import static org.wildfly.extension.microprofile.opentracing.ZipkinTracerConfigurationDefinition.ATTRIBUTES;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
-import org.wildfly.extension.microprofile.opentracing.resolver.JaegerTracerConfiguration;
+import org.wildfly.extension.microprofile.opentracing.resolver.ZipkinTracerConfiguration;
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfiguration;
 
 /**
  *
  * @author Emmanuel Hugonnet (c) 2019 Red Hat, Inc.
  */
-public class TracerConfigurationAddHandler extends AbstractAddStepHandler {
+public class ZipkinTracerConfigurationAddHandler extends AbstractAddStepHandler {
 
-    static final TracerConfigurationAddHandler INSTANCE = new TracerConfigurationAddHandler();
+    static final ZipkinTracerConfigurationAddHandler INSTANCE = new ZipkinTracerConfigurationAddHandler();
 
-    private TracerConfigurationAddHandler() {
-        super(TRACER_CAPABILITY, ATTRIBUTES);
+    private ZipkinTracerConfigurationAddHandler() {
+        super( ATTRIBUTES);
     }
 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
         super.performRuntime(context, operation, model);
-        TracerConfiguration config = new JaegerTracerConfiguration(context, operation);
-        OpentracingConfigurationService.installJaeger(context.getServiceTarget(), config, context.getCurrentAddressValue());
+        TracerConfiguration config = new ZipkinTracerConfiguration(context, operation);
+        OpentracingConfigurationService.installTracerConfigurationService(context.getServiceTarget(), config, context.getCurrentAddressValue());
     }
 
 }

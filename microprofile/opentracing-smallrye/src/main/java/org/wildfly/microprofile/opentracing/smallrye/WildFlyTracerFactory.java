@@ -18,8 +18,10 @@ package org.wildfly.microprofile.opentracing.smallrye;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopTracerFactory;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.msc.service.ServiceName;
 
@@ -50,6 +52,11 @@ public class WildFlyTracerFactory {
             }
         }
         return NoopTracerFactory.create();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getModules() {
+       return CONFIGURATIONS.values().stream().map(Configuration::get).filter(config -> config != null).map(TracerConfiguration::getModuleName).collect(Collectors.toList());
     }
 
     private static final class Configuration implements Consumer<TracerConfiguration> {

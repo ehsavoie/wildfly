@@ -24,4 +24,5 @@ import io.opentracing.Tracer;
 public interface TracerConfiguration {
 
     Tracer createTracer(String serviceName);
+    String getModuleName();
 }

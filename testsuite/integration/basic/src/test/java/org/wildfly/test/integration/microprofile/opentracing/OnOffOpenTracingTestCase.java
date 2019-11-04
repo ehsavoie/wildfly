@@ -111,7 +111,7 @@ public class OnOffOpenTracingTestCase {
 
     private void addOpentracingSubsystem() throws Exception {
         Utils.applyUpdate(Operations.createAddOperation(OT_SUBSYSTEM.toModelNode()), managementClient.getControllerClient());
-        ModelNode addTracer = Operations.createAddOperation(OT_SUBSYSTEM.append("tracer", "jaeger").toModelNode());
+        ModelNode addTracer = Operations.createAddOperation(OT_SUBSYSTEM.append("jaeger-tracer", "jaeger").toModelNode());
         addTracer.get("sampler-type").set("const");
         addTracer.get("sampler-param").set(1.0D);
         Utils.applyUpdate(addTracer, managementClient.getControllerClient());

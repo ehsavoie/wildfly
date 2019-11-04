@@ -15,6 +15,7 @@
  */
 package org.wildfly.extension.microprofile.opentracing;
 
+
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleMapAttributeDefinition;
@@ -29,6 +30,7 @@ import org.wildfly.microprofile.opentracing.smallrye.TracerConfigurationConstant
  * @author Emmanuel Hugonnet (c) 2019 Red Hat, Inc.
  */
 public class TracerAttributes {
+
 
     public static final StringListAttributeDefinition PROPAGATION = StringListAttributeDefinition.Builder.of(TracerConfigurationConstants.PROPAGATION)
             .setAllowNullElement(false)

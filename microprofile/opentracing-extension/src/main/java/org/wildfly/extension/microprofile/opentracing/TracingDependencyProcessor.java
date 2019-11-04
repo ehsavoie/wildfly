@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.wildfly.extension.microprofile.opentracing;
 
 import org.jboss.as.server.deployment.Attachments;
@@ -30,8 +29,11 @@ import org.jboss.as.server.deployment.module.ModuleDependency;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleLoader;
+
 import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.EXPORTED_MODULES;
 import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.MODULES;
+
+import org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory;
 
 public class TracingDependencyProcessor implements DeploymentUnitProcessor {
 
@@ -49,6 +51,9 @@ public class TracingDependencyProcessor implements DeploymentUnitProcessor {
         }
         for (String module : EXPORTED_MODULES) {
             moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, false, true, true, false));
+        }
+        for (String module : WildFlyTracerFactory.getModules()) {
+            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, false, false, true, false));
         }
     }
 

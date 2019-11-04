@@ -61,7 +61,7 @@ public class ZipkinTracerConfiguration implements TracerConfiguration {
                         .build())
                 .build();
         float sample = Double.valueOf(SAMPLER.resolveModelAttribute(context, configuration).asDouble()).floatValue();
-        if(sample == 0F) {
+        if (sample == 0F) {
             sampler = Sampler.NEVER_SAMPLE;
         } else if (sample >= 1F) {
             sampler = Sampler.ALWAYS_SAMPLE;
@@ -80,6 +80,11 @@ public class ZipkinTracerConfiguration implements TracerConfiguration {
                         .sampler(sampler)
                         .traceId128Bit(traceId128Bit)
                         .build());
+    }
+
+    @Override
+    public String getModuleName() {
+        return "io.zipkin.brave";
     }
 
 }

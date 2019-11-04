@@ -17,7 +17,7 @@ package org.wildfly.extension.microprofile.opentracing;
 
 
 
-import static org.wildfly.extension.microprofile.opentracing.TracerConfigurationDefinition.TRACER_CAPABILITY;
+import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.TRACER_CAPABILITY;
 
 import java.util.function.Consumer;
 import org.jboss.msc.Service;
@@ -57,7 +57,7 @@ public class OpentracingConfigurationService implements Service {
 
 
     @SuppressWarnings("unchecked")
-    public static final void installJaeger(ServiceTarget target, TracerConfiguration config, String tracerName) {
+    public static final void installTracerConfigurationService(ServiceTarget target, TracerConfiguration config, String tracerName) {
         ServiceName serviceName = TRACER_CAPABILITY.getCapabilityServiceName(tracerName);
         ServiceBuilder builder = target.addService(serviceName);
         builder.setInstance(new OpentracingConfigurationService(WildFlyTracerFactory.registerTracer(serviceName), config));
