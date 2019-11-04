@@ -72,6 +72,7 @@ public class SubsytemParser_2_0 extends PersistentResourceXMLParser {
                 );
         return builder(SubsystemExtension.SUBSYSTEM_PATH, NAMESPACE)
                 .addChild(jaegerTracer)
+                .addChild(zipkinTracer)
                 .addAttributes()
                 .build();
     }

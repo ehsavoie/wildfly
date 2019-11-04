@@ -26,6 +26,9 @@
     </resources>
 
     <dependencies>
+        <module name="java.logging"/>
+        <module name="io.opentracing.opentracing-api"/>
+        <module name="io.opentracing.opentracing-util"/>
         <module name="io.zipkin.reporter2" export="true"/>
     </dependencies>
 </module>
