@@ -19,25 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.wildfly.extension.microprofile.opentracing;
+
+import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.DEFAULT_TRACER;
+import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.DEFAULT_TRACER_CAPABILITY;
 
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.capability.RuntimeCapability;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
 
 class SubsystemAdd extends AbstractBoottimeAddStepHandler {
+
     static final SubsystemAdd INSTANCE = new SubsystemAdd();
 
     private SubsystemAdd() {
-        super();
+        super(DEFAULT_TRACER);
     }
 
     @Override
-    protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model) {
+    protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
         TracingExtensionLogger.ROOT_LOGGER.activatingSubsystem();
         context.addStep(new AbstractDeploymentChainStep() {
             @Override
@@ -48,7 +54,6 @@ class SubsystemAdd extends AbstractBoottimeAddStepHandler {
                         Phase.DEPENDENCIES_MICROPROFILE_OPENTRACING,
                         new TracingDependencyProcessor()
                 );
-
                 processorTarget.addDeploymentProcessor(SubsystemExtension.SUBSYSTEM_NAME,
                         Phase.POST_MODULE,
                         Phase.POST_MODULE_MICROPROFILE_OPENTRACING,
@@ -56,5 +61,15 @@ class SubsystemAdd extends AbstractBoottimeAddStepHandler {
                 );
             }
         }, OperationContext.Stage.RUNTIME);
+        super.performBoottime(context, operation, model);
+    }
+
+    @Override
+    protected void recordCapabilitiesAndRequirements(OperationContext context, ModelNode operation, Resource resource) throws OperationFailedException {
+        super.recordCapabilitiesAndRequirements(context, operation, resource);
+        ModelNode defaultTracer = DEFAULT_TRACER.resolveModelAttribute(context, operation);
+        if (defaultTracer.isDefined()) {
+            context.registerCapability(RuntimeCapability.Builder.of(DEFAULT_TRACER_CAPABILITY.getDynamicName(defaultTracer.asString()), false).build());
+        }
     }
 }

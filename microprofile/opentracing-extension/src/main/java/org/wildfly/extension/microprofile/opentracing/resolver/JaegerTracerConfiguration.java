@@ -22,8 +22,6 @@ import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.RE
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_MANAGER_HOST_PORT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_PARAM;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_TYPE;
-import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AGENT_HOST;
-import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AGENT_PORT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_PASSWORD;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_TOKEN;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_USER;
@@ -38,8 +36,10 @@ import io.jaegertracing.Configuration.SamplerConfiguration;
 import io.opentracing.Tracer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.network.OutboundSocketBinding;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfiguration;
@@ -56,7 +56,7 @@ public class JaegerTracerConfiguration implements TracerConfiguration {
     private final boolean traceId128Bit;
     private final Map<String, String> tracerTags;
 
-    public JaegerTracerConfiguration(OperationContext context, ModelNode configuration) throws OperationFailedException {
+    public JaegerTracerConfiguration(OperationContext context, ModelNode configuration, Supplier<OutboundSocketBinding> outboundSocketBindingSupplier) throws OperationFailedException {
         codecConfig = new CodecConfiguration();
         for (String codec : PROPAGATION.unwrap(context, configuration)) {
             codecConfig.withPropagation(Configuration.Propagation.valueOf(codec));
@@ -66,12 +66,14 @@ public class JaegerTracerConfiguration implements TracerConfiguration {
                 .withParam(SAMPLER_PARAM.resolveModelAttribute(context, configuration).asDoubleOrNull())
                 .withManagerHostPort(SAMPLER_MANAGER_HOST_PORT.resolveModelAttribute(context, configuration).asStringOrNull());
         Configuration.SenderConfiguration senderConfiguration = new Configuration.SenderConfiguration()
-                .withAgentHost(SENDER_AGENT_HOST.resolveModelAttribute(context, configuration).asStringOrNull())
-                .withAgentPort(SENDER_AGENT_PORT.resolveModelAttribute(context, configuration).asIntOrNull())
                 .withAuthPassword(SENDER_AUTH_PASSWORD.resolveModelAttribute(context, configuration).asStringOrNull())
                 .withAuthUsername(SENDER_AUTH_USER.resolveModelAttribute(context, configuration).asStringOrNull())
                 .withAuthToken(SENDER_AUTH_TOKEN.resolveModelAttribute(context, configuration).asStringOrNull())
                 .withEndpoint(SENDER_ENDPOINT.resolveModelAttribute(context, configuration).asStringOrNull());
+        if(outboundSocketBindingSupplier.get() != null) {
+            senderConfiguration.withAgentHost(outboundSocketBindingSupplier.get().getUnresolvedDestinationAddress())
+                    .withAgentPort(outboundSocketBindingSupplier.get().getDestinationPort());
+        }
         reporterConfig = new ReporterConfiguration()
                 .withSender(senderConfiguration)
                 .withFlushInterval(REPORTER_FLUSH_INTERVAL.resolveModelAttribute(context, configuration).asIntOrNull())
@@ -85,16 +87,6 @@ public class JaegerTracerConfiguration implements TracerConfiguration {
             }
         }
         traceId128Bit = TRACEID_128BIT.resolveModelAttribute(context, configuration).asBoolean();
-    }
-
-    public JaegerTracerConfiguration(Map<String, String> tracerTags,
-            CodecConfiguration codecConfig, SamplerConfiguration samplerConfig, ReporterConfiguration reporterConfig,
-            boolean traceId128Bit) {
-        this.codecConfig = codecConfig;
-        this.samplerConfig = samplerConfig;
-        this.reporterConfig = reporterConfig;
-        this.tracerTags = tracerTags;
-        this.traceId128Bit = traceId128Bit;
     }
 
     public SamplerConfiguration getSamplerConfig() {

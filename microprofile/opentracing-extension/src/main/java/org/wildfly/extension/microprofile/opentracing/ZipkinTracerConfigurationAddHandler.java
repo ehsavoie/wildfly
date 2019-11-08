@@ -15,12 +15,15 @@
  */
 package org.wildfly.extension.microprofile.opentracing;
 
+import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.TRACER_CAPABILITY;
 import static org.wildfly.extension.microprofile.opentracing.ZipkinTracerConfigurationDefinition.ATTRIBUTES;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceName;
 import org.wildfly.extension.microprofile.opentracing.resolver.ZipkinTracerConfiguration;
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfiguration;
 
@@ -39,8 +42,10 @@ public class ZipkinTracerConfigurationAddHandler extends AbstractAddStepHandler 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
         super.performRuntime(context, operation, model);
+        ServiceName serviceName = TRACER_CAPABILITY.getCapabilityServiceName(context.getCurrentAddressValue());
+        ServiceBuilder builder = context.getServiceTarget().addService(serviceName);
         TracerConfiguration config = new ZipkinTracerConfiguration(context, operation);
-        OpentracingConfigurationService.installTracerConfigurationService(context.getServiceTarget(), config, context.getCurrentAddressValue());
+        OpentracingConfigurationService.installTracerConfigurationService(builder, config, serviceName);
     }
 
 }

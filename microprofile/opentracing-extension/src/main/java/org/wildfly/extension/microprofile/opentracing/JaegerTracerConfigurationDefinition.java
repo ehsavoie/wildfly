@@ -22,11 +22,10 @@ import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.RE
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_MANAGER_HOST_PORT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_PARAM;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_TYPE;
-import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AGENT_HOST;
-import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AGENT_PORT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_PASSWORD;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_TOKEN;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_USER;
+import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_BINDING;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_ENDPOINT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.TRACEID_128BIT;
 import static org.wildfly.microprofile.opentracing.smallrye.WildFlyTracerFactory.TRACER_CAPABILITY_NAME;
@@ -55,7 +54,7 @@ public class JaegerTracerConfigurationDefinition extends PersistentResourceDefin
     public static final PathElement TRACER_CONFIGURATION_PATH = PathElement.pathElement("jaeger-tracer");
 
     public static final AttributeDefinition[] ATTRIBUTES = {PROPAGATION, SAMPLER_TYPE, SAMPLER_PARAM,
-        SAMPLER_MANAGER_HOST_PORT, SENDER_AGENT_HOST, SENDER_AGENT_PORT, SENDER_ENDPOINT, SENDER_AUTH_TOKEN,
+        SAMPLER_MANAGER_HOST_PORT, SENDER_BINDING, SENDER_ENDPOINT, SENDER_AUTH_TOKEN,
         SENDER_AUTH_USER, SENDER_AUTH_PASSWORD, REPORTER_LOG_SPANS, REPORTER_FLUSH_INTERVAL, REPORTER_MAX_QUEUE_SIZE,
         TRACEID_128BIT};
 

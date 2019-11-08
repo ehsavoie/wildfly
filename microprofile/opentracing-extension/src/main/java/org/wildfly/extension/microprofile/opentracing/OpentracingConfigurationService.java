@@ -17,13 +17,11 @@ package org.wildfly.extension.microprofile.opentracing;
 
 
 
-import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.TRACER_CAPABILITY;
 
 import java.util.function.Consumer;
 import org.jboss.msc.Service;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -57,9 +55,7 @@ public class OpentracingConfigurationService implements Service {
 
 
     @SuppressWarnings("unchecked")
-    public static final void installTracerConfigurationService(ServiceTarget target, TracerConfiguration config, String tracerName) {
-        ServiceName serviceName = TRACER_CAPABILITY.getCapabilityServiceName(tracerName);
-        ServiceBuilder builder = target.addService(serviceName);
+    public static final void installTracerConfigurationService(ServiceBuilder builder, TracerConfiguration config, ServiceName serviceName) {
         builder.setInstance(new OpentracingConfigurationService(WildFlyTracerFactory.registerTracer(serviceName), config));
         builder.install();
     }

@@ -53,7 +53,7 @@ public class TracingDependencyProcessor implements DeploymentUnitProcessor {
             moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, false, true, true, false));
         }
         for (String module : WildFlyTracerFactory.getModules()) {
-            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, false, false, true, false));
+            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, true, false, true, false));
         }
     }
 

@@ -40,8 +40,7 @@ import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SA
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_MANAGER_HOST_PORT;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_PARAM;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SAMPLER_TYPE;
-import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AGENT_HOST;
-import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AGENT_PORT;
+import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_BINDING;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_PASSWORD;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_TOKEN;
 import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.SENDER_AUTH_USER;
@@ -52,7 +51,7 @@ import org.jboss.as.controller.PersistentResourceXMLDescription.PersistentResour
 
 public class SubsytemParser_2_0 extends PersistentResourceXMLParser {
 
-    public static final String NAMESPACE = "urn:wildfly:microprofile-opentracing-smallrye:2.0";
+    public static final String OPENTRACING_NAMESPACE = "urn:wildfly:microprofile-opentracing-smallrye:2.0";
 
     static final PersistentResourceXMLParser INSTANCE = new SubsytemParser_2_0();
 
@@ -61,7 +60,7 @@ public class SubsytemParser_2_0 extends PersistentResourceXMLParser {
         PersistentResourceXMLBuilder jaegerTracer = builder(JaegerTracerConfigurationDefinition.TRACER_CONFIGURATION_PATH)
                 .addAttributes(
                         PROPAGATION, SAMPLER_TYPE, SAMPLER_PARAM, SAMPLER_MANAGER_HOST_PORT,
-                        SENDER_AGENT_HOST, SENDER_AGENT_PORT, SENDER_ENDPOINT, SENDER_AUTH_TOKEN,
+                        SENDER_BINDING, SENDER_ENDPOINT, SENDER_AUTH_TOKEN,
                         SENDER_AUTH_USER, SENDER_AUTH_PASSWORD, REPORTER_LOG_SPANS,
                         REPORTER_FLUSH_INTERVAL, REPORTER_MAX_QUEUE_SIZE, TRACEID_128BIT
                 );
@@ -70,10 +69,10 @@ public class SubsytemParser_2_0 extends PersistentResourceXMLParser {
                         ENDPOINT, ENCODING, CONNECTION_TIMEOUT, READ_TIMEOUT, MAX_REQUEST, MESSAGE_MAX_BYTES,
                         COMPRESSION, SAMPLER
                 );
-        return builder(SubsystemExtension.SUBSYSTEM_PATH, NAMESPACE)
+        return builder(SubsystemExtension.SUBSYSTEM_PATH, OPENTRACING_NAMESPACE)
+                .addAttributes(SubsystemDefinition.DEFAULT_TRACER)
                 .addChild(jaegerTracer)
                 .addChild(zipkinTracer)
-                .addAttributes()
                 .build();
     }
 }

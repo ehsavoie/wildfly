@@ -26,12 +26,14 @@ public class TracerConfigurationConstants {
         JAEGER, ZIPKIN;
     }
 
+    public static final String DEFAULT_TRACER = "default-tracer";
     public static final String PROPAGATION = "propagation";
 
     public static final String SAMPLER_TYPE = "sampler-type";
     public static final String SAMPLER_PARAM = "sampler-param";
     public static final String SAMPLER_MANAGER_HOST_PORT = "sampler-manager-host-port";
 
+    public static final String SENDER_AGENT_BINDING = "sender-binding";
     public static final String SENDER_AGENT_HOST = "sender-host";
     public static final String SENDER_AGENT_PORT = "sender-port";
     public static final String SENDER_ENDPOINT = "sender-endpoint";

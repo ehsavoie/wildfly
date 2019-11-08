@@ -20,7 +20,9 @@ import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleMapAttributeDefinition;
 import org.jboss.as.controller.StringListAttributeDefinition;
+import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
+import org.jboss.as.network.OutboundSocketBinding;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfigurationConstants;
@@ -31,6 +33,11 @@ import org.wildfly.microprofile.opentracing.smallrye.TracerConfigurationConstant
  */
 public class TracerAttributes {
 
+    private static final String OUTBOUND_SOCKET_BINDING_CAPABILITY_NAME = "org.wildfly.network.outbound-socket-binding";
+    static final RuntimeCapability<Void> OUTBOUND_SOCKET_BINDING_CAPABILITY =
+            RuntimeCapability.Builder.of(OUTBOUND_SOCKET_BINDING_CAPABILITY_NAME,
+                    true, OutboundSocketBinding.class)
+                    .build();
 
     public static final StringListAttributeDefinition PROPAGATION = StringListAttributeDefinition.Builder.of(TracerConfigurationConstants.PROPAGATION)
             .setAllowNullElement(false)
@@ -42,6 +49,7 @@ public class TracerAttributes {
 
     public static final SimpleAttributeDefinition SAMPLER_TYPE = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.SAMPLER_TYPE, ModelType.STRING, true)
             .setAllowedValues("const", "probabilistic", "ratelimiting", "remote")
+            .setDefaultValue(new ModelNode("remote"))
             .setAttributeGroup("sampler-configuration")
             .setRestartAllServices()
             .build();
@@ -54,12 +62,9 @@ public class TracerAttributes {
             .setRestartAllServices()
             .build();
 
-    public static final SimpleAttributeDefinition SENDER_AGENT_HOST = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.SENDER_AGENT_HOST, ModelType.STRING, true)
+    public static final SimpleAttributeDefinition SENDER_BINDING = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.SENDER_AGENT_BINDING, ModelType.STRING, true)
             .setAttributeGroup("sender-configuration")
-            .setRestartAllServices()
-            .build();
-    public static final SimpleAttributeDefinition SENDER_AGENT_PORT = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.SENDER_AGENT_PORT, ModelType.INT, true)
-            .setAttributeGroup("sender-configuration")
+            .setCapabilityReference(OUTBOUND_SOCKET_BINDING_CAPABILITY_NAME)
             .setRestartAllServices()
             .build();
     public static final SimpleAttributeDefinition SENDER_ENDPOINT = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.SENDER_ENDPOINT, ModelType.STRING, true)
@@ -85,6 +90,7 @@ public class TracerAttributes {
             .build();
     public static final SimpleAttributeDefinition REPORTER_FLUSH_INTERVAL = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.REPORTER_FLUSH_INTERVAL, ModelType.INT, true)
             .setAttributeGroup("reporter-configuration")
+            .setMeasurementUnit(MeasurementUnit.MILLISECONDS)
             .setRestartAllServices()
             .build();
     public static final SimpleAttributeDefinition REPORTER_MAX_QUEUE_SIZE = SimpleAttributeDefinitionBuilder.create(TracerConfigurationConstants.REPORTER_MAX_QUEUE_SIZE, ModelType.INT, true)

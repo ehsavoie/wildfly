@@ -47,7 +47,7 @@ public class SubsystemExtension implements Extension {
     private static final ModelVersion CURRENT_MODEL_VERSION = VERSION_2_0_0;
 
     private static final PersistentResourceXMLParser PARSER = SubsytemParser_2_0.INSTANCE;
-    public static final String NAMESPACE =SubsytemParser_2_0.NAMESPACE;
+    public static final String NAMESPACE = SubsytemParser_2_0.OPENTRACING_NAMESPACE;
 
     static ResourceDescriptionResolver getResourceDescriptionResolver(final String... keyPrefix) {
         String[] prefixes = new String[keyPrefix.length + 1];

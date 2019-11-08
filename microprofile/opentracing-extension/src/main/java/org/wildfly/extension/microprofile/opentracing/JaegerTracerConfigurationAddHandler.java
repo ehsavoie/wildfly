@@ -16,11 +16,17 @@
 package org.wildfly.extension.microprofile.opentracing;
 
 import static org.wildfly.extension.microprofile.opentracing.JaegerTracerConfigurationDefinition.ATTRIBUTES;
+import static org.wildfly.extension.microprofile.opentracing.SubsystemDefinition.TRACER_CAPABILITY;
+import static org.wildfly.extension.microprofile.opentracing.TracerAttributes.OUTBOUND_SOCKET_BINDING_CAPABILITY;
 
+import java.util.function.Supplier;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.network.OutboundSocketBinding;
 import org.jboss.dmr.ModelNode;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceName;
 import org.wildfly.extension.microprofile.opentracing.resolver.JaegerTracerConfiguration;
 import org.wildfly.microprofile.opentracing.smallrye.TracerConfiguration;
 
@@ -39,8 +45,22 @@ public class JaegerTracerConfigurationAddHandler extends AbstractAddStepHandler 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
         super.performRuntime(context, operation, model);
-        TracerConfiguration config = new JaegerTracerConfiguration(context, operation);
-        OpentracingConfigurationService.installTracerConfigurationService(context.getServiceTarget(), config, context.getCurrentAddressValue());
+        ServiceName serviceName = TRACER_CAPABILITY.getCapabilityServiceName(context.getCurrentAddressValue());
+        ServiceBuilder builder = context.getServiceTarget().addService(serviceName);
+        String outboundSocketBindingName = TracerAttributes.SENDER_BINDING.resolveModelAttribute(context, model).asStringOrNull();
+        Supplier<OutboundSocketBinding> outboundSocketBindingSupplier;
+        if (outboundSocketBindingName != null) {
+            outboundSocketBindingSupplier = builder.requires(OUTBOUND_SOCKET_BINDING_CAPABILITY.getCapabilityServiceName(outboundSocketBindingName));
+        } else {
+            outboundSocketBindingSupplier = new Supplier<OutboundSocketBinding>() {
+                @Override
+                public OutboundSocketBinding get() {
+                    return null;
+                }
+            };
+        }
+        TracerConfiguration config = new JaegerTracerConfiguration(context, operation, outboundSocketBindingSupplier);
+        OpentracingConfigurationService.installTracerConfigurationService(builder, config, serviceName);
     }
 
 }
