@@ -22,6 +22,7 @@
 
 package org.wildfly.extension.messaging.activemq;
 
+import javax.net.ssl.SSLContext;
 import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.as.network.OutboundSocketBinding;
 import org.jboss.as.network.SocketBinding;
@@ -58,8 +59,17 @@ public class Capabilities {
 
     /**
      * The capability name for the Elytron security domain.
+     *
+     * @see <a href="https://github.com/wildfly/wildfly-capabilities/blob/master/org/wildfly/security/security-domain/capability.adoc">documentation</a>
      */
     static final String ELYTRON_DOMAIN_CAPABILITY = "org.wildfly.security.security-domain";
+
+    /**
+     * The capability name for the Elytron SSL context.
+     *
+     * @see <a href="https://github.com/wildfly/wildfly-capabilities/blob/master/org/wildfly/security/ssl-context/capability.adoc">documentation</a>
+     */
+    public static final RuntimeCapability ELYTRON_SSL_CONTEXT_CAPABILITY = RuntimeCapability.Builder.of("org.wildfly.security.ssl-context", true, SSLContext.class).build();
 
     /**
      * The capability for the PathManager

@@ -39,13 +39,16 @@ public class ExternalBrokerConfigurationService implements Service<ExternalBroke
     // mapping between the {broadcast|discovery}-groups and the command dispatcher factory they use
     private final Map<String, ServiceName> commandDispatcherFactories;
 
+    private final Map<String, String> sslContextNames;
+
     public ExternalBrokerConfigurationService(final Map<String, TransportConfiguration> connectors,
             Map<String, DiscoveryGroupConfiguration> discoveryGroupConfigurations,
             Map<String, ServiceName> socketBindings,
             Map<String, ServiceName> outboundSocketBindings,
             Map<String, ServiceName> groupBindings,
             Map<String, ServiceName> commandDispatcherFactories,
-            Map<String, String> clusterNames) {
+            Map<String, String> clusterNames,
+            Map<String, String> sslContextNames) {
         this.connectors = connectors;
         this.discoveryGroupConfigurations = discoveryGroupConfigurations;
         this.clusterNames = clusterNames;
@@ -53,6 +56,7 @@ public class ExternalBrokerConfigurationService implements Service<ExternalBroke
         this.groupBindings = groupBindings;
         this.outboundSocketBindings = outboundSocketBindings;
         this.socketBindings = socketBindings;
+        this.sslContextNames = sslContextNames;
     }
 
     @Override
@@ -89,6 +93,10 @@ public class ExternalBrokerConfigurationService implements Service<ExternalBroke
 
     public Map<String, DiscoveryGroupConfiguration> getDiscoveryGroupConfigurations() {
         return discoveryGroupConfigurations;
+    }
+
+    public Map<String, String> getSslContextNames() {
+        return sslContextNames;
     }
 
     @Override

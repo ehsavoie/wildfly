@@ -25,7 +25,10 @@ package org.wildfly.extension.messaging.activemq;
 import static org.jboss.as.controller.transform.description.RejectAttributeChecker.DEFINED;
 import static org.jboss.as.controller.transform.description.RejectAttributeChecker.UNDEFINED;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.CONNECTOR;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.HTTP_ACCEPTOR;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.HTTP_CONNECTOR;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.IN_VM_CONNECTOR;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.REMOTE_ACCEPTOR;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.REMOTE_CONNECTOR;
 import static org.wildfly.extension.messaging.activemq.MessagingExtension.EXTERNAL_JMS_QUEUE_PATH;
 import static org.wildfly.extension.messaging.activemq.MessagingExtension.EXTERNAL_JMS_TOPIC_PATH;
@@ -86,8 +89,28 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
     }
 
     private static void registerTransformers_WF_20(ResourceTransformationDescriptionBuilder subsystem) {
+        subsystem.addChildResource(PathElement.pathElement(REMOTE_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        subsystem.addChildResource(PathElement.pathElement(HTTP_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
 
+        ResourceTransformationDescriptionBuilder server = subsystem.addChildResource(SERVER_PATH);
+        server.addChildResource(PathElement.pathElement(REMOTE_ACCEPTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        server.addChildResource(PathElement.pathElement(HTTP_ACCEPTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        server.addChildResource(PathElement.pathElement(REMOTE_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        server.addChildResource(PathElement.pathElement(HTTP_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
     }
+
     private static void registerTransformers_WF_19(ResourceTransformationDescriptionBuilder subsystem) {
         subsystem.addChildResource(DiscoveryGroupDefinition.PATH).setCustomResourceTransformer(ResourceTransformer.DISCARD);
         subsystem.addChildRedirection(JGroupsDiscoveryGroupDefinition.PATH, DiscoveryGroupDefinition.PATH);

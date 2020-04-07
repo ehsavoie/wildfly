@@ -90,7 +90,8 @@
                          auto-delete-addresses="false" />
 
         <remote-connector name="netty"
-                                           socket-binding="messaging-throughput">
+                          socket-binding="messaging-throughput"
+                          ssl-context="messaging">
             <param name="batch-delay" value="${batch.delay:50}"/>
         </remote-connector>
 

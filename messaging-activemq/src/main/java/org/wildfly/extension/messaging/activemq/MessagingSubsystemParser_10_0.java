@@ -79,14 +79,16 @@ public class MessagingSubsystemParser_10_0 extends PersistentResourceXMLParser {
         final PersistentResourceXMLBuilder remoteConnector = builder(pathElement(REMOTE_CONNECTOR))
                 .addAttributes(
                         RemoteTransportDefinition.SOCKET_BINDING,
-                        CommonAttributes.PARAMS);
+                        CommonAttributes.PARAMS,
+                        CommonAttributes.SSL_CONTEXT);
 
         final PersistentResourceXMLBuilder httpConnector = builder(MessagingExtension.HTTP_CONNECTOR_PATH)
                 .addAttributes(
                         HTTPConnectorDefinition.SOCKET_BINDING,
                         HTTPConnectorDefinition.ENDPOINT,
                         HTTPConnectorDefinition.SERVER_NAME,
-                        CommonAttributes.PARAMS);
+                        CommonAttributes.PARAMS,
+                        CommonAttributes.SSL_CONTEXT);
 
         final PersistentResourceXMLBuilder invmConnector = builder(pathElement(IN_VM_CONNECTOR))
                 .addAttributes(
@@ -375,12 +377,14 @@ public class MessagingSubsystemParser_10_0 extends PersistentResourceXMLParser {
                                                 .addAttributes(
                                                         HTTPAcceptorDefinition.HTTP_LISTENER,
                                                         HTTPAcceptorDefinition.UPGRADE_LEGACY,
-                                                        CommonAttributes.PARAMS))
+                                                        CommonAttributes.PARAMS,
+                                                        CommonAttributes.SSL_CONTEXT))
                                 .addChild(
                                         builder(pathElement(REMOTE_ACCEPTOR))
                                                 .addAttributes(
                                                         RemoteTransportDefinition.SOCKET_BINDING,
-                                                        CommonAttributes.PARAMS))
+                                                        CommonAttributes.PARAMS,
+                                                        CommonAttributes.SSL_CONTEXT))
                                 .addChild(
                                         builder(pathElement(IN_VM_ACCEPTOR))
                                                 .addAttributes(

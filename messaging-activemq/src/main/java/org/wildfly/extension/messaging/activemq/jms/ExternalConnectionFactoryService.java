@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.jms.ConnectionFactory;
+import javax.net.ssl.SSLContext;
 import org.apache.activemq.artemis.api.core.DiscoveryGroupConfiguration;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.jms.ActiveMQJMSClient;
@@ -52,6 +53,7 @@ public class ExternalConnectionFactoryService implements Service<ConnectionFacto
 
     private final Map<String, Supplier<SocketBinding>> socketBindings;
     private final Map<String, Supplier<OutboundSocketBinding>> outboundSocketBindings;
+    private final Map<String, Supplier<SSLContext>> sslContexts;
     private final Map<String, Supplier<SocketBinding>> groupBindings;
     // mapping between the {discovery}-groups and the cluster names they use
     private final Map<String, String> clusterNames;
@@ -62,12 +64,12 @@ public class ExternalConnectionFactoryService implements Service<ConnectionFacto
     ExternalConnectionFactoryService(DiscoveryGroupConfiguration groupConfiguration,
             Map<String, Supplier<CommandDispatcherFactory>> commandDispatcherFactories,
             Map<String, Supplier<SocketBinding>> groupBindings, Map<String, String> clusterNames, JMSFactoryType type, boolean ha, boolean enable1Prefixes) {
-        this(ha, enable1Prefixes, type, groupConfiguration, Collections.emptyMap(), Collections.emptyMap(),commandDispatcherFactories, groupBindings, clusterNames, null);
+        this(ha, enable1Prefixes, type, groupConfiguration, Collections.emptyMap(), Collections.emptyMap(),commandDispatcherFactories, groupBindings, Collections.emptyMap(),clusterNames, null);
     }
 
     ExternalConnectionFactoryService(TransportConfiguration[] connectors, Map<String, Supplier<SocketBinding>> socketBindings,
-            Map<String, Supplier<OutboundSocketBinding>> outboundSocketBindings, JMSFactoryType type, boolean ha, boolean enable1Prefixes) {
-        this(ha, enable1Prefixes, type, null, socketBindings, outboundSocketBindings, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap(), connectors);
+            Map<String, Supplier<OutboundSocketBinding>> outboundSocketBindings, Map<String, Supplier<SSLContext>> sslContexts, JMSFactoryType type, boolean ha, boolean enable1Prefixes) {
+        this(ha, enable1Prefixes, type, null, socketBindings, outboundSocketBindings, Collections.emptyMap(), Collections.emptyMap(), sslContexts, Collections.emptyMap(), connectors);
     }
 
     private ExternalConnectionFactoryService(boolean ha,
@@ -78,6 +80,7 @@ public class ExternalConnectionFactoryService implements Service<ConnectionFacto
             Map<String, Supplier<OutboundSocketBinding>> outboundSocketBindings,
             Map<String, Supplier<CommandDispatcherFactory>> commandDispatcherFactories,
             Map<String, Supplier<SocketBinding>> groupBindings,
+            Map<String, Supplier<SSLContext>> sslContexts,
             Map<String, String> clusterNames,
             TransportConfiguration[] connectors) {
         assert (connectors != null && connectors.length > 0) || groupConfiguration != null;
@@ -91,6 +94,7 @@ public class ExternalConnectionFactoryService implements Service<ConnectionFacto
         this.clusterNames = clusterNames;
         this.commandDispatcherFactories = commandDispatcherFactories;
         this.groupBindings = groupBindings;
+        this.sslContexts = sslContexts;
     }
 
     @Override

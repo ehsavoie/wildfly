@@ -269,7 +269,8 @@ public class MessagingActiveMQSubsystem_10_0_TestCase extends AbstractSubsystemB
                                 AddressSettingDefinition.AUTO_DELETE_ADDRESSES))
                 .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_CONNECTOR)),
                         new FailedOperationTransformationConfig.NewAttributesConfig(
-                                HTTPConnectorDefinition.SERVER_NAME))
+                                HTTPConnectorDefinition.SERVER_NAME,
+                                CommonAttributes.SSL_CONTEXT))
                 .addFailedAttribute(subsystemAddress.append(SERVER_PATH, BRIDGE_PATH),
                         new FailedOperationTransformationConfig.NewAttributesConfig(
                                 BridgeDefinition.PRODUCER_WINDOW_SIZE))
@@ -291,6 +292,16 @@ public class MessagingActiveMQSubsystem_10_0_TestCase extends AbstractSubsystemB
                                 ConnectionFactoryAttributes.Common.DESERIALIZATION_BLACKLIST,
                                 ConnectionFactoryAttributes.Common.DESERIALIZATION_WHITELIST,
                                 ConnectionFactoryAttributes.Common.USE_TOPOLOGY))
+                .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_CONNECTOR)),
+                            new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_ACCEPTOR)),
+                            new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_ACCEPTOR)),
+                            new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.REMOTE_CONNECTOR)),
+                            new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.HTTP_CONNECTOR)),
+                            new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
                 ;
         } else if (messagingVersion.equals(MessagingExtension.VERSION_2_0_0)) {
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, ADDRESS_SETTING_PATH),
@@ -313,7 +324,18 @@ public class MessagingActiveMQSubsystem_10_0_TestCase extends AbstractSubsystemB
                 .addFailedAttribute(subsystemAddress.append(SERVER_PATH, CONNECTION_FACTORY_PATH),
                         new FailedOperationTransformationConfig.NewAttributesConfig(
                                 ConnectionFactoryAttributes.Common.INITIAL_MESSAGE_PACKET_SIZE,
-                                ConnectionFactoryAttributes.Common.USE_TOPOLOGY));
+                                ConnectionFactoryAttributes.Common.USE_TOPOLOGY))
+                .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_CONNECTOR)),
+                           new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_ACCEPTOR)),
+                         new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_ACCEPTOR)),
+                        new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.REMOTE_CONNECTOR)),
+                        new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                .addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.HTTP_CONNECTOR)),
+                        new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT))
+                 ;
         } else if(messagingVersion.compareTo(MessagingExtension.VERSION_5_0_0) > 0 ){
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH),
                     new FailedOperationTransformationConfig.NewAttributesConfig(
@@ -323,6 +345,12 @@ public class MessagingActiveMQSubsystem_10_0_TestCase extends AbstractSubsystemB
                             ServerDefinition.JOURNAL_FILE_OPEN_TIMEOUT));
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, CONNECTION_FACTORY_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(ConnectionFactoryAttributes.Common.USE_TOPOLOGY));
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, POOLED_CONNECTION_FACTORY_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(ConnectionFactoryAttributes.Common.USE_TOPOLOGY));
+            config.addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.REMOTE_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.HTTP_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_ACCEPTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_ACCEPTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
         } else if (messagingVersion.compareTo(MessagingExtension.VERSION_6_0_0) > 0 ) {
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(ServerDefinition.JOURNAL_FILE_OPEN_TIMEOUT));
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, CONNECTION_FACTORY_PATH), new FailedOperationTransformationConfig.NewAttributesConfig(ConnectionFactoryAttributes.Common.USE_TOPOLOGY));
@@ -331,6 +359,12 @@ public class MessagingActiveMQSubsystem_10_0_TestCase extends AbstractSubsystemB
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, MessagingExtension.SOCKET_BROADCAST_GROUP_PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, JGroupsDiscoveryGroupDefinition.PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
             config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, SocketDiscoveryGroupDefinition.PATH), FailedOperationTransformationConfig.REJECTED_RESOURCE);
+            config.addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.REMOTE_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(pathElement(CommonAttributes.HTTP_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_CONNECTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.REMOTE_ACCEPTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
+            config.addFailedAttribute(subsystemAddress.append(SERVER_PATH, pathElement(CommonAttributes.HTTP_ACCEPTOR)), new FailedOperationTransformationConfig.NewAttributesConfig(CommonAttributes.SSL_CONTEXT));
         }
 
         if (messagingVersion.compareTo(MessagingExtension.VERSION_4_0_0) > 0) {
@@ -376,6 +410,7 @@ public class MessagingActiveMQSubsystem_10_0_TestCase extends AbstractSubsystemB
                 Capabilities.ELYTRON_DOMAIN_CAPABILITY,
                 Capabilities.ELYTRON_DOMAIN_CAPABILITY + ".elytronDomain",
                 CredentialReference.CREDENTIAL_STORE_CAPABILITY + ".cs1",
-                Capabilities.DATA_SOURCE_CAPABILITY + ".fooDS");
+                Capabilities.DATA_SOURCE_CAPABILITY + ".fooDS",
+                Capabilities.ELYTRON_SSL_CONTEXT_CAPABILITY.getDynamicName("messaging"));
     }
 }

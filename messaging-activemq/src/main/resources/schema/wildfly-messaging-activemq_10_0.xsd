@@ -28,7 +28,7 @@
            targetNamespace="urn:jboss:domain:messaging-activemq:10.0"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
-           version="9.0">
+           version="10.0">
 
     <xs:import namespace="urn:wildfly:credential-reference:1.0" schemaLocation="wildfly-credential-reference_1_0.xsd"/>
 
@@ -411,6 +411,7 @@
                     <xs:attribute name="upgrade-legacy" type="xs:boolean" use="optional" />
                     <xs:attribute name="name" type="xs:string" use="required" />
                     <xs:attribute name="http-listener" type="xs:string" use="required" />
+                    <xs:attribute name="ssl-context" type="xs:string" use="optional" />
                 </xs:complexType>
             </xs:element>
 
@@ -421,6 +422,7 @@
                     </xs:sequence>
                     <xs:attribute name="name" type="xs:string" use="required" />
                     <xs:attribute name="socket-binding" type="xs:string" use="required" />
+                    <xs:attribute name="ssl-context" type="xs:string" use="optional" />
                 </xs:complexType>
             </xs:element>
 
@@ -892,6 +894,7 @@
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required" />
         <xs:attribute name="socket-binding" type="xs:string" use="required" />
+        <xs:attribute name="ssl-context" type="xs:string" use="optional" />
     </xs:complexType>
 
     <xs:complexType name="http-connectorType">
@@ -902,6 +905,7 @@
         <xs:attribute name="socket-binding" type="xs:string" use="required" />
         <xs:attribute name="endpoint" type="xs:string" use="required" />
         <xs:attribute name="server-name" type="xs:string" />
+        <xs:attribute name="ssl-context" type="xs:string" use="optional" />
     </xs:complexType>
 
     <xs:complexType name="in-vm-connectorType">

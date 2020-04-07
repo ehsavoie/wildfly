@@ -36,6 +36,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.management.MBeanServer;
+import javax.net.ssl.SSLContext;
 import javax.sql.DataSource;
 
 import org.apache.activemq.artemis.api.core.BroadcastGroupConfiguration;
@@ -112,6 +113,8 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
     private final Optional<Supplier<SecurityDomain>> elytronSecurityDomain;
     // Supplier for legacy SecurityDomainContext
     private final Optional<Supplier<SecurityDomainContext>> securityDomainContext;
+    // Supplier for Elytron SecurityDomain
+    private final Map<String, Supplier<SSLContext>> sslContexts;
 
     // credential source injectors
     private Map<String, InjectedValue<ExceptionSupplier<CredentialSource, Exception>>> bridgeCredentialSource = new HashMap<>();
@@ -130,7 +133,8 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
                                  Optional<Supplier<SecurityDomain>> elytronSecurityDomain,
                                  Optional<Supplier<SecurityDomainContext>> securityDomainContext,
                                  Optional<Supplier<MBeanServer>> mbeanServer,
-                                 Optional<Supplier<DataSource>> dataSource) {
+                                 Optional<Supplier<DataSource>> dataSource,
+                                  Map<String, Supplier<SSLContext>> sslContexts) {
         this.configuration = configuration;
         this.pathConfig = pathConfig;
         this.dataSource = dataSource;
@@ -150,6 +154,7 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
                 bridgeCredentialSource.put(bridgeConfiguration.getName(), new InjectedValue<>());
             }
         }
+        this.sslContexts = sslContexts;
     }
 
     @Override
@@ -176,6 +181,9 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
         configuration.setJournalDirectory(pathConfig.resolveJournalPath(pathManager.get()));
         configuration.setPagingDirectory(pathConfig.resolvePagingPath(pathManager.get()));
         pathConfig.registerCallbacks(pathManager.get());
+        for(Map.Entry<String, Supplier<SSLContext>> entry : sslContexts.entrySet()) {
+            org.jboss.activemq.artemis.wildfly.integration.WildFlySSLContextFactory.registerElytronSSLContext(entry.getKey(), entry.getValue().get());
+        }
 
         try {
             // Update the acceptor/connector port/host values from the
@@ -202,7 +210,6 @@ class ActiveMQServerService implements Service<ActiveMQServer> {
                     }
                 }
             }
-
             if(broadcastGroups != null) {
                 final List<BroadcastGroupConfiguration> newConfigs = new ArrayList<>();
                 for(final BroadcastGroupConfiguration config : broadcastGroups) {
