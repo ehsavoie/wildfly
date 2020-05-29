@@ -5,6 +5,7 @@
         <include name="management"/>
         <include name="logging"/>
         <include name="undertow-load-balancer"/>
+        <include name="git-history"/>
     </layers>
     <feature-group name="standalone-security-realms"/>
     <feature-group name="management-legacy-security"/>
