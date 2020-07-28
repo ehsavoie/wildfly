@@ -4,7 +4,7 @@
     <dependencies>
         <layer name="ejb3-lite"/>
         <layer name="resource-adapters"/>
-        <layer name="jms-activemq"/>
+        <layer name="messaging-activemq"/>
     </dependencies>
 
     <!-- TODO may need to import feature-group for embedded activemq -->

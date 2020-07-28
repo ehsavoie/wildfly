@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<layer-spec xmlns="urn:jboss:galleon:layer-spec:1.0" name="embedded-activemq">
+    <dependencies>
+        <layer name="resource-adapters"/>
+        <layer name="legacy-security" optional="true"/>
+    </dependencies>
+    <feature-group name="jca"/>
+    <feature-group name="messaging-activemq"/>
+    <feature spec="subsystem.naming">
+        <feature spec="subsystem.naming.service.remote-naming"/>
+    </feature>
+    <feature spec="subsystem.undertow.server">
+        <param name="server" value="default-server" />
+        <feature spec="subsystem.undertow.server.host">
+            <param name="host" value="default-host" />
+            <feature spec="subsystem.undertow.server.host.setting.http-invoker">
+                <param name="security-realm" value="ApplicationRealm"/>
+            </feature>
+        </feature>
+    </feature>
+</layer-spec>

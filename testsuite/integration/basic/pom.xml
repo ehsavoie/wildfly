@@ -594,7 +594,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.6.0</version>
                         <executions>
                             <execution>
                                 <id>generate-ldap-store</id>
@@ -949,7 +948,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>${version.exec.plugin}</version>
                         <executions>
                             <!-- There is no similar option as -Dcom.sun.CORBA.ORBUseDynamicStub=true for IBM JDK
                             we need to create stub do it manually with rmic tools -->
@@ -1055,11 +1053,48 @@
             </properties>
             <build>
                 <plugins>
+                    <!-- Copy users and their roles -->
                     <!-- Disable the standard copy-based provisioning -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
+                        <executions combine.children="append">
+                            <!-- Copy users and roles config from shared resources. -->
+                            <execution>
+                                <id>ejb3-lite.ts.config-as.copy-mgmt-users</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <inherited>true</inherited>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/wildfly-ejb3-lite/standalone/configuration</outputDirectory>
+                                    <overwrite>true</overwrite>
+                                    <resources>
+                                        <resource>
+                                            <directory>../../shared/src/main/resources</directory>
+                                            <includes><include>*.properties</include></includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution><execution>
+                                <id>ejb3-embedded-broker.ts.config-as.copy-mgmt-users</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <inherited>true</inherited>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/wildfly-ejb3-embedded-broker/standalone/configuration</outputDirectory>
+                                    <overwrite>true</overwrite>
+                                    <resources>
+                                        <resource>
+                                            <directory>../../shared/src/main/resources</directory>
+                                            <includes><include>*.properties</include></includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>ts.copy-wildfly</id>
                                 <goals>
@@ -1262,6 +1297,46 @@
                                                 <layer>cloud-server</layer>
                                                 <layer>h2-default-datasource</layer>
                                                 <layer>ejb3-iiop</layer>
+                                            </layers>
+                                        </config>
+                                    </configurations>
+                                </configuration>
+                            </execution>
+                            <!-- Provision a cloud-profile server with ejb3 and embedded-broker-->
+                            <execution>
+                                <id>ejb3-embedded-broker-provisioning</id>
+                                <goals>
+                                    <goal>provision</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <install-dir>${project.build.directory}/wildfly-ejb3-embedded-broker</install-dir>
+                                    <record-state>false</record-state>
+                                    <log-time>${galleon.log.time}</log-time>
+                                    <offline>true</offline>
+                                    <plugin-options>
+                                        <jboss-maven-dist/>
+                                        <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                        <optional-packages>passive+</optional-packages>
+                                    </plugin-options>
+                                    <feature-packs>
+                                        <feature-pack>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                            <version>${testsuite.ee.galleon.pack.version}</version>
+                                            <inherit-configs>false</inherit-configs>
+                                            <inherit-packages>false</inherit-packages>
+                                        </feature-pack>
+                                    </feature-packs>
+                                    <configurations>
+                                        <config>
+                                            <model>standalone</model>
+                                            <name>standalone.xml</name>
+                                            <layers>
+                                                <layer>cloud-server</layer>
+                                                <layer>h2-default-datasource</layer>
+                                                <layer>ejb3</layer>
+                                                <layer>embedded-activemq</layer>
                                             </layers>
                                         </config>
                                     </configurations>
@@ -1555,6 +1630,33 @@
                                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                     <includes>
                                         <include>org/jboss/as/test/integration/ejb/iiop/**/*TestCase.java</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                            <!-- Tests against the install with ejb3 and embedded broker-->
+                            <execution>
+                                <id>ejb3-embedded-broker-layers.surefire</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <systemPropertyVariables>
+                                        <jboss.install.dir>${basedir}/target/wildfly-ejb3-embedded-broker</jboss.install.dir>
+                                        <jboss.home>${project.build.directory}/wildfly-ejb3-embedded-broker</jboss.home>
+                                        <jboss.home.dir>${project.build.directory}/wildfly-ejb3-embedded-broker</jboss.home.dir>
+                                        <jbossas.dist>${project.build.directory}/wildfly-ejb3-embedded-broker</jbossas.dist>
+                                        <jboss.dist>${project.build.directory}/wildfly-ejb3-embedded-broker</jboss.dist>
+                                        <!-- Override the standard module path that points at the shared module set from dist -->
+                                        <module.path>${project.build.directory}/wildfly-ejb3-embedded-broker/modules${path.separator}${basedir}/target/modules</module.path>
+                                    </systemPropertyVariables>
+                                    <environmentVariables>
+                                        <JBOSS_HOME>${project.build.directory}/wildfly-ejb3-embedded-broker</JBOSS_HOME>
+                                    </environmentVariables>
+                                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                                    <includes>
+                                        <include>org/jboss/as/test/integration/ejb/mdb/**/*TestCase.java</include>
+                                        <include>org/jboss/as/test/integration/messaging/**/*TestCase.java</include>
                                     </includes>
                                 </configuration>
                             </execution>
