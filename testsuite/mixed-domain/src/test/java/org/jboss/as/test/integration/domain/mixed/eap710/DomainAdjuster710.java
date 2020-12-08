@@ -55,7 +55,6 @@ public class DomainAdjuster710 extends DomainAdjuster720 {
 
         list.addAll(removeEESecurity(profileAddress.append(SUBSYSTEM, "ee-security")));
         list.addAll(removeDiscovery(profileAddress.append(SUBSYSTEM, "discovery")));
-        list.addAll(removeMicroProfileOpenTracing(profileAddress.append(SUBSYSTEM, "microprofile-opentracing-smallrye")));
         list.addAll(removeMicroProfileConfigSmallrye(profileAddress.append(SUBSYSTEM, "microprofile-config-smallrye")));
         return list;
     }
@@ -104,17 +103,6 @@ public class DomainAdjuster710 extends DomainAdjuster720 {
 
         list.add(createRemoveOperation(subsystem));
         list.add(createRemoveOperation(PathAddress.pathAddress(EXTENSION, "org.wildfly.extension.microprofile.config-smallrye")));
-        return list;
-    }
-
-    /*
-     * microprofile-opentracing subsystem and extension do not exist in previous versions, so remove it
-     */
-    private Collection<? extends ModelNode> removeMicroProfileOpenTracing(final PathAddress subsystem) {
-        final List<ModelNode> list = new ArrayList<>();
-
-        list.add(createRemoveOperation(subsystem));
-        list.add(createRemoveOperation(PathAddress.pathAddress(EXTENSION, "org.wildfly.extension.microprofile.opentracing-smallrye")));
         return list;
     }
 }
