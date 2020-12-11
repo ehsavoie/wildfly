@@ -91,7 +91,6 @@
                 <extension module="org.wildfly.extension.elytron"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
             </excluded-extensions>
         </host-exclude>
@@ -106,7 +105,6 @@
                 <extension module="org.wildfly.extension.elytron"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
             </excluded-extensions>
         </host-exclude>
@@ -118,7 +116,6 @@
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
             </excluded-extensions>
         </host-exclude>
@@ -130,7 +127,6 @@
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
             </excluded-extensions>
         </host-exclude>
@@ -141,7 +137,6 @@
                 <extension module="org.wildfly.extension.datasources-agroal" />
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
             </excluded-extensions>
         </host-exclude>
