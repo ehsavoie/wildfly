@@ -24,7 +24,6 @@ package org.jboss.as.test.integration.domain.mixed.eap730;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.EXTENSION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
-import static org.jboss.as.controller.operations.common.Util.createEmptyOperation;
 import static org.jboss.as.controller.operations.common.Util.createRemoveOperation;
 
 import java.util.ArrayList;
@@ -50,7 +49,6 @@ public class DomainAdjuster730 extends DomainAdjuster {
 
         removeMicroProfileJWT(ops, profileAddress.append(SUBSYSTEM, "microprofile-jwt-smallrye"));
         adjustUndertow(ops, profileAddress.append(SUBSYSTEM, "undertow"));
-        adjustOpenTracing(ops, profileAddress.append(SUBSYSTEM, "microprofile-opentracing-smallrye"));
 
         return ops;
     }
@@ -70,13 +68,5 @@ public class DomainAdjuster730 extends DomainAdjuster {
                 .append("server", "default-server")
                 .append("https-listener", "https");
         ops.add(Util.getEmptyOperation(ModelDescriptionConstants.REMOVE, httpsListener.toModelNode()));
-    }
-
-    private void adjustOpenTracing(final List<ModelNode> ops, final PathAddress subsystem) {
-        // jaeger resource does not exist
-        ModelNode undefineAttr = createEmptyOperation("undefine-attribute", subsystem);
-        undefineAttr.get("name").set("default-tracer");
-        ops.add(undefineAttr);
-        ops.add(createRemoveOperation(subsystem.append("jaeger-tracer", "jaeger")));
     }
 }
