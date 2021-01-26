@@ -16,8 +16,12 @@
 package org.wildfly.extension.messaging.activemq;
 
 import java.util.Map;
+import java.util.function.Supplier;
+import javax.net.ssl.SSLContext;
 import org.apache.activemq.artemis.api.core.DiscoveryGroupConfiguration;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
+import org.apache.activemq.artemis.spi.core.remoting.ssl.SSLContextFactoryProvider;
+import org.jboss.activemq.artemis.wildfly.integration.WildFlySSLContextFactory;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
@@ -39,13 +43,16 @@ public class ExternalBrokerConfigurationService implements Service<ExternalBroke
     // mapping between the {broadcast|discovery}-groups and the command dispatcher factory they use
     private final Map<String, ServiceName> commandDispatcherFactories;
 
+    private final Map<String,  Supplier<SSLContext>> sslContexts;
+
     public ExternalBrokerConfigurationService(final Map<String, TransportConfiguration> connectors,
             Map<String, DiscoveryGroupConfiguration> discoveryGroupConfigurations,
             Map<String, ServiceName> socketBindings,
             Map<String, ServiceName> outboundSocketBindings,
             Map<String, ServiceName> groupBindings,
             Map<String, ServiceName> commandDispatcherFactories,
-            Map<String, String> clusterNames) {
+            Map<String, String> clusterNames,
+            Map<String,  Supplier<SSLContext>> sslContexts) {
         this.connectors = connectors;
         this.discoveryGroupConfigurations = discoveryGroupConfigurations;
         this.clusterNames = clusterNames;
@@ -53,14 +60,19 @@ public class ExternalBrokerConfigurationService implements Service<ExternalBroke
         this.groupBindings = groupBindings;
         this.outboundSocketBindings = outboundSocketBindings;
         this.socketBindings = socketBindings;
+        this.sslContexts = sslContexts;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
+        for(Map.Entry<String, Supplier<SSLContext>> entry : sslContexts.entrySet()) {
+            WildFlySSLContextFactory.registerElytronSSLContext(entry.getKey(), entry.getValue().get());
+        }
     }
 
     @Override
     public void stop(StopContext context) {
+        SSLContextFactoryProvider.getSSLContextFactory().clearSSLContexts();
     }
 
     public Map<String, TransportConfiguration> getConnectors() {
@@ -89,6 +101,10 @@ public class ExternalBrokerConfigurationService implements Service<ExternalBroke
 
     public Map<String, DiscoveryGroupConfiguration> getDiscoveryGroupConfigurations() {
         return discoveryGroupConfigurations;
+    }
+
+    public Map<String, Supplier<SSLContext>> getSslContextNames() {
+        return sslContexts;
     }
 
     @Override

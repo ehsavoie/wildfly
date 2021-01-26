@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Supplier;
+import javax.net.ssl.SSLContext;
 import org.apache.activemq.artemis.api.core.BroadcastGroupConfiguration;
 import org.apache.activemq.artemis.api.core.DiscoveryGroupConfiguration;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
@@ -65,6 +67,7 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.wildfly.clustering.spi.ClusteringDefaultRequirement;
 import org.wildfly.clustering.spi.ClusteringRequirement;
+import static org.wildfly.extension.messaging.activemq.Capabilities.ELYTRON_SSL_CONTEXT_CAPABILITY;
 import org.wildfly.extension.messaging.activemq.deployment.DefaultJMSConnectionFactoryBindingProcessor;
 import org.wildfly.extension.messaging.activemq.deployment.DefaultJMSConnectionFactoryResourceReferenceProcessor;
 import org.wildfly.extension.messaging.activemq.deployment.JMSConnectionFactoryDefinitionAnnotationProcessor;
@@ -167,8 +170,13 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 final ModelNode model = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
                 // Process connectors
                 final Set<String> connectorsSocketBindings = new HashSet<String>();
-                final Map<String, TransportConfiguration> connectors = TransportConfigOperationHandlers.processConnectors(context, "localhost", model, connectorsSocketBindings);
-
+                final Map<String, String> sslContextNames = new HashMap<>();
+                final Map<String, TransportConfiguration> connectors = TransportConfigOperationHandlers.processConnectors(context, "localhost", model, connectorsSocketBindings, sslContextNames);
+                Map<String, Supplier<SSLContext>> sslContexts = new HashMap<>();
+                for (final Map.Entry<String, String> entry : sslContextNames.entrySet()) {
+                    Supplier<SSLContext> sslContext = serviceBuilder.requires(ELYTRON_SSL_CONTEXT_CAPABILITY.getCapabilityServiceName(entry.getValue()));
+                    sslContexts.put(entry.getValue(), sslContext);
+                }
                 Map<String, ServiceName> outboundSocketBindings = new HashMap<>();
                 Map<String, Boolean> outbounds = TransportConfigOperationHandlers.listOutBoundSocketBinding(context, connectorsSocketBindings);
                 Map<String, ServiceName> socketBindings = new HashMap<>();
@@ -243,7 +251,8 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         outboundSocketBindings,
                         groupBindings,
                         commandDispatcherFactories,
-                        clusterNames))
+                        clusterNames,
+                        sslContexts))
                         .install();
             }
         }, OperationContext.Stage.RUNTIME);
