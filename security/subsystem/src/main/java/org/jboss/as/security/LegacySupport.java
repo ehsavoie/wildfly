@@ -44,6 +44,7 @@ import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.jboss.as.controller.AttributeDefinition;
 
 import org.jboss.as.controller.ListAttributeDefinition;
 import org.jboss.as.controller.ModelVersion;
@@ -52,6 +53,7 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationStepHandler;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.as.controller.operations.validation.EnumValidator;
@@ -99,6 +101,11 @@ class LegacySupport {
 
         public JASPIAuthenticationModulesAttributeDefinition() {
             super(LegacySupportListAttributeBuilder.of(Constants.AUTH_MODULES, Constants.AUTH_MODULE, validator));
+        }
+
+        @Override
+        public AttributeDefinition getValueType() {
+            return SimpleAttributeDefinitionBuilder.create(Constants.AUTH_MODULE, ModelType.STRING).build();
         }
 
         @Override
@@ -187,6 +194,11 @@ class LegacySupport {
         }
 
         @Override
+        public AttributeDefinition getValueType() {
+            return SimpleAttributeDefinitionBuilder.create(getName(), ModelType.STRING).build();
+        }
+
+        @Override
         protected void addValueTypeDescription(ModelNode node, ResourceBundle bundle) {
             // This method being used indicates a misuse of this class
             throw SecurityLogger.ROOT_LOGGER.unsupportedOperationExceptionUseResourceDesc();
@@ -269,6 +281,11 @@ class LegacySupport {
         }
 
         @Override
+        public AttributeDefinition getValueType() {
+            return SimpleAttributeDefinitionBuilder.create(Constants.MAPPING_MODULE, ModelType.STRING).build();
+        }
+
+        @Override
         protected void addValueTypeDescription(ModelNode node, ResourceBundle bundle) {
             // This method being used indicates a misuse of this class
             throw SecurityLogger.ROOT_LOGGER.unsupportedOperationExceptionUseResourceDesc();
@@ -337,6 +354,11 @@ class LegacySupport {
             super(LegacySupportListAttributeBuilder.of(name, xmlName, validator)
                             .setDeprecated(ModelVersion.create(1, 2, 0))
             );
+        }
+
+        @Override
+        public AttributeDefinition getValueType() {
+            return SimpleAttributeDefinitionBuilder.create(getName(), ModelType.STRING).build();
         }
 
         @Override

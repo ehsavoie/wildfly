@@ -41,6 +41,7 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.jboss.as.controller.AttributeDefinition;
 
 import org.jboss.as.controller.ListAttributeDefinition;
 import org.jboss.as.controller.ObjectListAttributeDefinition;
@@ -96,6 +97,10 @@ public class TimerAttributeDefinition extends ListAttributeDefinition {
         }
     }
 
+    @Override
+    public AttributeDefinition getValueType() {
+        throw EjbLogger.ROOT_LOGGER.resourceBundleDescriptionsNotSupported(getName());
+    }
 
     @Override
     protected void addValueTypeDescription(ModelNode node, ResourceBundle bundle) {
