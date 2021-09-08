@@ -147,17 +147,19 @@
                          auto-delete-addresses="false" />
 
         <remote-connector name="netty"
-                                           socket-binding="messaging-throughput">
+                          socket-binding="messaging-throughput"
+                          ssl-context="messaging">
             <param name="batch-delay" value="${batch.delay:50}"/>
         </remote-connector>
 
         <in-vm-connector name="in-vm"
-                                          server-id="${my.server-id:0}"/>
+                         server-id="${my.server-id:0}"/>
 
         <http-connector name="http"
                         socket-binding="http"
                         endpoint="http"
-                        server-name="=foo">
+                        server-name="foo"
+                        ssl-context="messaging">
             <param name="batch-delay" value="${batch.delay:50}"/>
         </http-connector>
 

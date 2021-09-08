@@ -169,7 +169,8 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 final ModelNode model = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
                 // Process connectors
                 final Set<String> connectorsSocketBindings = new HashSet<String>();
-                final Map<String, TransportConfiguration> connectors = TransportConfigOperationHandlers.processConnectors(context, "localhost", model, connectorsSocketBindings);
+                final Map<String, String> sslContextNames = new HashMap<>();
+                final Map<String, TransportConfiguration> connectors = TransportConfigOperationHandlers.processConnectors(context, "localhost", model, connectorsSocketBindings, sslContextNames);
 
                 Map<String, ServiceName> outboundSocketBindings = new HashMap<>();
                 Map<String, Boolean> outbounds = TransportConfigOperationHandlers.listOutBoundSocketBinding(context, connectorsSocketBindings);
@@ -238,7 +239,8 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         outboundSocketBindings,
                         groupBindings,
                         commandDispatcherFactories,
-                        clusterNames))
+                        clusterNames,
+                        sslContextNames))
                         .install();
             }
         }, OperationContext.Stage.RUNTIME);
