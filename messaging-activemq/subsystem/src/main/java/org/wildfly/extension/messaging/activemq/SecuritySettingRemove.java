@@ -29,8 +29,6 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
 
 /**
  * {@code OperationStepHandler} for removing an existing security setting.
@@ -43,20 +41,11 @@ class SecuritySettingRemove extends AbstractRemoveStepHandler {
 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
-        final ActiveMQServer server = getServer(context, operation);
+        final PathAddress address = PathAddress.pathAddress(operation.require(ModelDescriptionConstants.OP_ADDR));
+        final ActiveMQServer server = MessagingServices.getServer(context, address);
         if(server != null) {
-            final PathAddress address = PathAddress.pathAddress(operation.require(ModelDescriptionConstants.OP_ADDR));
             final String match = address.getLastElement().getValue();
             server.getSecurityRepository().removeMatch(match);
         }
-    }
-
-    static ActiveMQServer getServer(final OperationContext context, ModelNode operation) {
-        final ServiceName serviceName = MessagingServices.getActiveMQServiceName(PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR)));
-        final ServiceController<?> controller = context.getServiceRegistry(true).getService(serviceName);
-        if(controller != null) {
-            return ActiveMQServer.class.cast(controller.getValue());
-        }
-        return null;
     }
 }

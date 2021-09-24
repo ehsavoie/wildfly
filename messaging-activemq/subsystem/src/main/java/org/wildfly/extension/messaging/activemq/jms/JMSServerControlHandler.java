@@ -57,13 +57,10 @@ import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
 import org.jboss.as.controller.logging.ControllerLogger;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
 import org.wildfly.extension.messaging.activemq.MessagingServices;
 import org.wildfly.extension.messaging.activemq.logging.MessagingLogger;
 
@@ -109,9 +106,9 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
         }
 
         final String operationName = operation.require(OP).asString();
-        final ActiveMQServer server = getServer(context, operation);
+        PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
+        final ActiveMQServer server = MessagingServices.getServer(context, address);
         if (server == null) {
-            PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
             throw ControllerLogger.ROOT_LOGGER.managementResourceNotFound(address);
         }
         final ActiveMQServerControl serverControl = server.getActiveMQServerControl();
@@ -321,13 +318,6 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
                 .setReplyType(STRING)
                 .build(),
                 this);
-    }
-
-    private ActiveMQServer getServer(final OperationContext context, final ModelNode operation) {
-        final ServiceName serviceName = MessagingServices.getActiveMQServiceName(PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR)));
-        ServiceController<?> service = context.getServiceRegistry(false).getService(serviceName);
-        ActiveMQServer server = ActiveMQServer.class.cast(service.getValue());
-        return server;
     }
 
     public String[] listTargetDestinations(ActiveMQServer server, String sessionID) throws Exception {

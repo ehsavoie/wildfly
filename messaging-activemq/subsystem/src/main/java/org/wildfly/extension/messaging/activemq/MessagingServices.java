@@ -26,10 +26,12 @@ import static org.wildfly.extension.messaging.activemq.CommonAttributes.JMS_BRID
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.SUBSYSTEM;
 
 import java.util.function.Function;
+import org.apache.activemq.artemis.core.server.ActiveMQServer;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.capability.CapabilityServiceSupport;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -157,5 +159,18 @@ public class MessagingServices {
                 pathAddress.getLastElement().getValue()
             };
         }
+    }
+
+    public static ActiveMQServer getServer(final OperationContext context, PathAddress pathAddress) {
+        final ServiceName serviceName = getActiveMQServiceName(pathAddress);
+        final ServiceController<?> controller = context.getServiceRegistry(true).getService(serviceName);
+        if(controller != null) {
+            try {
+                return ActiveMQServer.class.cast(controller.getValue());
+            } catch( IllegalStateException ex) {
+                return null;
+            }
+        }
+        return null;
     }
 }

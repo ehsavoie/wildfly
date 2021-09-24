@@ -33,8 +33,6 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
 
 /**
  * {@code OperationStepHandler} for removing a security role.
@@ -48,7 +46,7 @@ class SecurityRoleRemove extends AbstractRemoveStepHandler {
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
         final PathAddress address = PathAddress.pathAddress(operation.require(ModelDescriptionConstants.OP_ADDR));
-        final ActiveMQServer server = getServer(context, operation);
+        final ActiveMQServer server = MessagingServices.getServer(context, address);
         final String match = address.getElement(address.size() - 2).getValue();
         final String roleName = address.getLastElement().getValue();
         removeRole(server, match, roleName);
@@ -65,14 +63,5 @@ class SecurityRoleRemove extends AbstractRemoveStepHandler {
             }
             server.getSecurityRepository().addMatch(match, newRoles);
         }
-    }
-
-    static ActiveMQServer getServer(final OperationContext context, ModelNode operation) {
-        final ServiceName serviceName = MessagingServices.getActiveMQServiceName(PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR)));
-        final ServiceController<?> controller = context.getServiceRegistry(true).getService(serviceName);
-        if(controller != null) {
-            return ActiveMQServer.class.cast(controller.getValue());
-        }
-        return null;
     }
 }

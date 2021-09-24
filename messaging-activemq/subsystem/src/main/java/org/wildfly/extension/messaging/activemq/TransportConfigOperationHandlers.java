@@ -281,6 +281,7 @@ public class TransportConfigOperationHandlers {
                     String sslContextName = config.get(CommonAttributes.SSL_CONTEXT.getName()).asString();
                     sslContexts.put(acceptorName, sslContextName);
                     parameters.put(TransportConstants.SSL_CONTEXT_PROP_NAME, sslContextName);
+                    parameters.put(TransportConstants.SSL_ENABLED_PROP_NAME, true);
                 }
                 ModelNode socketBinding = GenericTransportDefinition.SOCKET_BINDING.resolveModelAttribute(context, config);
                 if (socketBinding.isDefined()) {
@@ -305,6 +306,7 @@ public class TransportConfigOperationHandlers {
                     String sslContextName = config.get(CommonAttributes.SSL_CONTEXT.getName()).asString();
                     sslContexts.put(acceptorName, sslContextName);
                     parameters.put(TransportConstants.SSL_CONTEXT_PROP_NAME, sslContextName);
+                    parameters.put(TransportConstants.SSL_ENABLED_PROP_NAME, true);
                 }
                 acceptors.put(acceptorName, new TransportConfiguration(NettyAcceptorFactory.class.getName(), parameters, acceptorName, extraParameters));
             }
@@ -330,6 +332,7 @@ public class TransportConfigOperationHandlers {
                     String sslContextName = config.get(CommonAttributes.SSL_CONTEXT.getName()).asString();
                     sslContexts.put(acceptorName, config.get(CommonAttributes.SSL_CONTEXT.getName()).asString());
                     parameters.put(TransportConstants.SSL_CONTEXT_PROP_NAME, sslContextName);
+                    parameters.put(TransportConstants.SSL_ENABLED_PROP_NAME, true);
                 }
                 acceptors.put(acceptorName, new TransportConfiguration(NettyAcceptorFactory.class.getName(), parameters, acceptorName, extraParameters));
             }

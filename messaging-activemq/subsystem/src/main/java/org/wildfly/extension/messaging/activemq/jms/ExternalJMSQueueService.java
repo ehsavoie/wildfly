@@ -86,7 +86,10 @@ public class ExternalJMSQueueService implements Service<Queue> {
                         @Override
                         public void nodeUP(TopologyMember member, boolean last) {
                             try (ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(false, member.getLive())) {
-                                factory.setProtocolManagerFactoryStr(protocolManagerFactor);
+                                // TODO : remove if when ARTEMIS-3494 is fixed
+                                if("org.apache.activemq.artemis.core.protocol.hornetq.client.HornetQClientProtocolManagerFactory".equals(protocolManagerFactor)) {
+                                    factory.setProtocolManagerFactoryStr(protocolManagerFactor);
+                                }
                                 MessagingLogger.ROOT_LOGGER.infof("Creating queue %s on node UP %s - %s", queueName, member.getNodeId(), member.getLive().toJson());
                                 config.createQueue(factory, managementQueue, queueName);
                             } catch (JMSException | StartException ex) {
@@ -95,7 +98,11 @@ public class ExternalJMSQueueService implements Service<Queue> {
                             }
                             if (member.getBackup() != null) {
                                 try (ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(false, member.getBackup())) {
-                                    factory.setProtocolManagerFactoryStr(protocolManagerFactor);
+                                    // TODO : remove if when ARTEMIS-3494 is fixed
+                                    if ("org.apache.activemq.artemis.core.protocol.hornetq.client.HornetQClientProtocolManagerFactory".equals(protocolManagerFactor)) {
+                                        factory.setProtocolManagerFactoryStr(protocolManagerFactor);
+                                    }
+                                    factory.getServerLocator().setProtocolManagerFactory(locator.getProtocolManagerFactory());
                                     MessagingLogger.ROOT_LOGGER.infof("Creating queue %s on backup node UP %s - %s", queueName, member.getNodeId(), member.getBackup().toJson());
                                     config.createQueue(factory, managementQueue, queueName);
                                 } catch (JMSException | StartException ex) {
