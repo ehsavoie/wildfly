@@ -28,7 +28,7 @@
     </properties>
 
     <resources>
-        <artifact name="${io.netty:netty-transport-native-kqueue}"/>
+        <artifact name="${io.netty:netty-transport-classes-kqueue}"/>
     </resources>
 
     <dependencies>

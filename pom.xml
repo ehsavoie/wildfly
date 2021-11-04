@@ -326,7 +326,7 @@
         <version.io.agroal>1.3</version.io.agroal>
         <version.io.grpc>1.36.1</version.io.grpc>
         <version.io.jaegertracing>1.6.0</version.io.jaegertracing>
-        <version.io.netty>4.1.68.Final</version.io.netty>
+        <version.io.netty>4.1.70.Final</version.io.netty>
         <version.io.opentelemetry.opentelemetry>1.5.0</version.io.opentelemetry.opentelemetry>
         <version.io.opentracing>0.33.0</version.io.opentracing>
         <version.io.opentracing.concurrent>0.4.0</version.io.opentracing.concurrent>
@@ -2223,7 +2223,31 @@
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
-                <artifactId>netty-transport-native-epoll</artifactId>
+                <artifactId>netty-transport-native-unix-common</artifactId>
+                <version>${version.io.netty}</version>
+                <classifier>linux-x86_64</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-unix-common</artifactId>
+                <version>${version.io.netty}</version>
+                <classifier>linux-aarch_64</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-classes-epoll</artifactId>
                 <version>${version.io.netty}</version>
                 <exclusions>
                     <exclusion>
@@ -2234,7 +2258,31 @@
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
-                <artifactId>netty-transport-native-kqueue</artifactId>
+                <artifactId>netty-transport-native-epoll</artifactId>
+                <version>${version.io.netty}</version>
+                <classifier>linux-x86_64</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-epoll</artifactId>
+                <version>${version.io.netty}</version>
+                <classifier>linux-aarch_64</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-classes-kqueue</artifactId>
                 <version>${version.io.netty}</version>
                 <exclusions>
                     <exclusion>
