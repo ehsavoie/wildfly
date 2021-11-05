@@ -27,8 +27,23 @@
         <property name="jboss.api" value="private"/>
     </properties>
 
-    <resources>
-        <artifact name="${io.netty:netty-all}"/>
+    <resources> 
+        <resource-root path="lib"/>
+        <artifact name="${io.netty:netty-buffer}"/>
+        <artifact name="${io.netty:netty-codec}"/>
+        <artifact name="${io.netty:netty-codec-dns}"/>
+        <artifact name="${io.netty:netty-codec-http}"/>
+        <artifact name="${io.netty:netty-codec-http2}"/>
+        <artifact name="${io.netty:netty-codec-socks}"/>
+        <artifact name="${io.netty:netty-common}"/>
+        <artifact name="${io.netty:netty-handler}"/>
+        <artifact name="${io.netty:netty-handler-proxy}"/>
+        <artifact name="${io.netty:netty-resolver}"/>
+        <artifact name="${io.netty:netty-resolver-dns}"/>
+        <artifact name="${io.netty:netty-transport}"/>
+        <artifact name="${io.netty:netty-transport-classes-epoll}"/>
+        <artifact name="${io.netty:netty-transport-classes-kqueue}"/>
+        <artifact name="${io.netty:netty-transport-native-unix-common}"/>
     </resources>
 
     <dependencies>
@@ -40,5 +55,6 @@
         <module name="sun.jdk"/>
         <module name="jdk.sctp"/>
         <module name="jdk.unsupported"/>
+        <module name="org.jctools"/>
     </dependencies>
 </module>
