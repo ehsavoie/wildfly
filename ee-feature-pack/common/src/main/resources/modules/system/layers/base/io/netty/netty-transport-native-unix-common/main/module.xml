@@ -28,6 +28,7 @@
     </properties>
 
     <resources>
+        <resource-root path="lib"/>
         <artifact name="${io.netty:netty-transport-native-unix-common}"/>
     </resources>
 
