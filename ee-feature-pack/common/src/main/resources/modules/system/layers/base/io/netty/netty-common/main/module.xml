@@ -40,6 +40,7 @@
         <module name="sun.jdk"/>
         <module name="jdk.sctp"/>
         <module name="jdk.unsupported"/>
-        <module name="org.jctools" />
+        <module name="io.netty.netty-transport-native-unix-common"/>
+        <module name="io.netty.netty-transport-native-epoll"/>
     </dependencies>
 </module>
