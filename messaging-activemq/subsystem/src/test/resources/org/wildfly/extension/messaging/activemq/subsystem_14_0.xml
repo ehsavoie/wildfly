@@ -5,12 +5,14 @@
     <http-connector name="client-http"
                     socket-binding="http"
                     endpoint="http"
-                    server-name="=foo">
+                    server-name="=foo"
+                    ssl-context="messaging">
         <param name="batch-delay" value="${batch.delay:50}"/>
     </http-connector>
 
     <remote-connector name="client-netty-throughput"
-                      socket-binding="messaging-throughput">
+                      socket-binding="messaging-throughput"
+                      ssl-context="messaging">
         <param name="batch-delay" value="${batch.delay:50}"/>
     </remote-connector>
 

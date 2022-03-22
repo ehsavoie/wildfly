@@ -25,7 +25,10 @@ import static org.jboss.as.controller.security.CredentialReference.REJECT_CREDEN
 import static org.jboss.as.controller.transform.description.RejectAttributeChecker.DEFINED;
 import static org.jboss.as.controller.transform.description.RejectAttributeChecker.UNDEFINED;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.CONNECTOR;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.HTTP_ACCEPTOR;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.HTTP_CONNECTOR;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.IN_VM_CONNECTOR;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.REMOTE_ACCEPTOR;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.REMOTE_CONNECTOR;
 import static org.wildfly.extension.messaging.activemq.MessagingExtension.EXTERNAL_JMS_QUEUE_PATH;
 import static org.wildfly.extension.messaging.activemq.MessagingExtension.EXTERNAL_JMS_TOPIC_PATH;
@@ -70,7 +73,7 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
     @Override
     public void registerTransformers(SubsystemTransformerRegistration registration) {
         ChainedTransformationDescriptionBuilder builder = TransformationDescriptionBuilder.Factory.createChainedSubystemInstance(registration.getCurrentSubsystemVersion());
-        registerTransformers_WF_25(builder.createBuilder(MessagingExtension.VERSION_14_0_0, MessagingExtension.VERSION_13_0_0));
+        registerTransformers_WF_26(builder.createBuilder(MessagingExtension.VERSION_14_0_0, MessagingExtension.VERSION_13_0_0));
         registerTransformers_WF_23(builder.createBuilder(MessagingExtension.VERSION_13_0_0, MessagingExtension.VERSION_12_0_0));
         registerTransformers_WF_22(builder.createBuilder(MessagingExtension.VERSION_12_0_0, MessagingExtension.VERSION_11_0_0));
         registerTransformers_WF_21(builder.createBuilder(MessagingExtension.VERSION_11_0_0, MessagingExtension.VERSION_10_0_0));
@@ -91,15 +94,32 @@ public class MessagingTransformerRegistration implements ExtensionTransformerReg
             MessagingExtension.VERSION_12_0_0, MessagingExtension.VERSION_13_0_0, MessagingExtension.VERSION_14_0_0});
     }
 
-    private static void registerTransformers_WF_25(ResourceTransformationDescriptionBuilder subsystem) {
-        ResourceTransformationDescriptionBuilder bridge = subsystem
-                .addChildResource(MessagingExtension.SERVER_PATH)
-                .addChildResource(MessagingExtension.BRIDGE_PATH);
-        rejectDefinedAttributeWithDefaultValue(bridge, BridgeDefinition.ROUTING_TYPE);
+    private static void registerTransformers_WF_26(ResourceTransformationDescriptionBuilder subsystem) {
+        subsystem.addChildResource(PathElement.pathElement(REMOTE_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        subsystem.addChildResource(PathElement.pathElement(HTTP_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
         ResourceTransformationDescriptionBuilder externaljmsqueue = subsystem.addChildResource(MessagingExtension.EXTERNAL_JMS_QUEUE_PATH);
         rejectDefinedAttributeWithDefaultValue(externaljmsqueue,ConnectionFactoryAttributes.External.ENABLE_AMQ1_PREFIX);
         ResourceTransformationDescriptionBuilder externaljmstopic = subsystem.addChildResource(MessagingExtension.EXTERNAL_JMS_TOPIC_PATH);
         rejectDefinedAttributeWithDefaultValue(externaljmstopic,ConnectionFactoryAttributes.External.ENABLE_AMQ1_PREFIX);
+        ResourceTransformationDescriptionBuilder server = subsystem.addChildResource(SERVER_PATH);
+        ResourceTransformationDescriptionBuilder bridge = server.addChildResource(MessagingExtension.BRIDGE_PATH);
+        rejectDefinedAttributeWithDefaultValue(bridge, BridgeDefinition.ROUTING_TYPE);
+        server.addChildResource(PathElement.pathElement(REMOTE_ACCEPTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        server.addChildResource(PathElement.pathElement(HTTP_ACCEPTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        server.addChildResource(PathElement.pathElement(REMOTE_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
+        server.addChildResource(PathElement.pathElement(HTTP_CONNECTOR)).getAttributeBuilder()
+                .addRejectCheck(DEFINED, CommonAttributes.SSL_CONTEXT)
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, CommonAttributes.SSL_CONTEXT);
     }
 
     private static void registerTransformers_WF_23(ResourceTransformationDescriptionBuilder subsystem) {
