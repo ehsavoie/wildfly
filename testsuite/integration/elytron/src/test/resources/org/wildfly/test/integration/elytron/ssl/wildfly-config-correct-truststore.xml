@@ -4,10 +4,10 @@
     <authentication-client xmlns="urn:elytron:client:1.4">
         <key-stores>
             <key-store name="truststore" type="JKS">
-                <file name="target/UndertowTwoWaySslNeedClientAuthTestCase/client.truststore"/>
+                <file name="target/artemis/client.truststore"/>
             </key-store>
             <key-store name="keystore" type="JKS">
-                <file name="target/UndertowTwoWaySslNeedClientAuthTestCase/client.keystore"/>
+                <file name="target/artemis/client.keystore"/>
                 <key-store-clear-password password="123456" />
             </key-store>
         </key-stores>

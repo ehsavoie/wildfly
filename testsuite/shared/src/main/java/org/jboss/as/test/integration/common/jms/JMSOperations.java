@@ -84,7 +84,19 @@ public interface JMSOperations {
      * @param socketBinding name of socket binding
      * @param params        params
      */
-    void createRemoteAcceptor(String name, String socketBinding, Map<String, String> params);
+    default void createRemoteAcceptor(String name, String socketBinding, Map<String, String> params) {
+        createRemoteAcceptor(name, socketBinding, null, params);
+    }
+
+    /**
+     * Creates remote acceptor
+     *
+     * @param name          name of the remote acceptor
+     * @param socketBinding name of socket binding
+     * @param sslContext
+     * @param params        params
+     */
+    void createRemoteAcceptor(String name, String socketBinding, String sslContext, Map<String, String> params);
 
     /**
      * Remove remote acceptor
@@ -100,11 +112,29 @@ public interface JMSOperations {
      * @param socketBinding name of socket binding
      * @param params        params
      */
-    void createRemoteConnector(String name, String socketBinding, Map<String, String> params);
+    default void createRemoteConnector(String name, String socketBinding, Map<String, String> params) {
+        createRemoteConnector(name, socketBinding, null, params);
+    }
+
+ /**
+     * Creates remote connector
+     *
+     * @param name          name of the remote connector
+     * @param socketBinding name of socket binding
+     * @param sslContext
+     * @param params        params
+     */
+    void createRemoteConnector(String name, String socketBinding, String sslContext, Map<String, String> params);
+
+    void removeRemoteConnector(String name);
 
     void close();
 
-    void addHttpConnector(String connectorName, String socketBinding, String endpoint, Map<String, String> parameters);
+    default void addHttpConnector(String connectorName, String socketBinding, String endpoint, Map<String, String> parameters) {
+        addHttpConnector(connectorName, socketBinding, endpoint, null, parameters);
+    }
+
+    void addHttpConnector(String connectorName, String socketBinding, String endpoint, String sslContext, Map<String, String> parameters);
 
     void removeHttpConnector(String connectorName);
 
@@ -129,6 +159,8 @@ public interface JMSOperations {
     void enableMessagingTraces();
 
     void createSocketBinding(String name, String interfaceName, int port);
+
+    void removeSocketBinding(String name);
 
     boolean isRemoteBroker();
 

@@ -207,10 +207,13 @@ public class ActiveMQProviderJMSOperations implements JMSOperations {
     }
 
     @Override
-    public void createRemoteAcceptor(String name, String socketBinding, Map<String, String> params) {
+    public void createRemoteAcceptor(String name, String socketBinding, String sslContext, Map<String, String> params) {
         ModelNode model = getServerAddress().add("remote-acceptor", name);
         ModelNode attributes = new ModelNode();
         attributes.get("socket-binding").set(socketBinding);
+        if(sslContext != null && ! sslContext.isBlank()) {
+            attributes.get("ssl-context").set(sslContext);
+        }
         if (params != null) {
             for (String key : params.keySet()) {
                 model.get("params").add(key, params.get(key));
@@ -298,12 +301,15 @@ public class ActiveMQProviderJMSOperations implements JMSOperations {
     }
 
     @Override
-    public void addHttpConnector(String connectorName, String socketBinding, String endpoint, Map<String, String> parameters) {
+    public void addHttpConnector(String connectorName, String socketBinding, String endpoint, String sslContext, Map<String, String> parameters) {
         ModelNode address = getServerAddress().add("http-connector", connectorName);
 
         ModelNode attributes = new ModelNode();
         attributes.get("socket-binding").set(socketBinding);
         attributes.get("endpoint").set(endpoint);
+        if(sslContext != null && ! sslContext.isBlank()) {
+            attributes.get("ssl-context").set(sslContext);
+        }
         if (parameters != null && parameters.size() > 0) {
             ModelNode params = attributes.get("params").setEmptyList();
             for (Map.Entry<String, String> param : parameters.entrySet()) {
@@ -377,10 +383,13 @@ public class ActiveMQProviderJMSOperations implements JMSOperations {
     }
 
     @Override
-    public void createRemoteConnector(String name, String socketBinding, Map<String, String> params) {
+    public void createRemoteConnector(String name, String socketBinding, String sslContext, Map<String, String> params) {
         ModelNode address = PathAddress.parseCLIStyleAddress(" /subsystem=messaging-activemq/server=default/remote-connector=" + name).toModelNode();
         ModelNode attributes = new ModelNode();
         attributes.get("socket-binding").set(socketBinding);
+        if(sslContext != null && ! sslContext.isBlank()) {
+            attributes.get("ssl-context").set(sslContext);
+        }
         if (params != null) {
             for (String key : params.keySet()) {
                 attributes.get("params").add(key, params.get(key));
@@ -391,6 +400,12 @@ public class ActiveMQProviderJMSOperations implements JMSOperations {
         } catch (Exception e) {
         }
         executeOperation(address, ADD, attributes);
+    }
+
+    @Override
+    public void removeRemoteConnector(String connectorName) {
+        ModelNode address = getServerAddress().add("remote-connector", connectorName);
+        executeOperation(address, REMOVE_OPERATION, null);
     }
 
     @Override
@@ -405,6 +420,13 @@ public class ActiveMQProviderJMSOperations implements JMSOperations {
         } catch (Exception e) {
         }
         executeOperation(address, ADD, attributes);
+    }
+
+
+    @Override
+    public void removeSocketBinding(String name) {
+        ModelNode address = PathAddress.parseCLIStyleAddress("/socket-binding-group=standard-sockets/socket-binding=" + name).toModelNode();
+        executeOperation(address, REMOVE_OPERATION, null);
     }
 
     @Override
