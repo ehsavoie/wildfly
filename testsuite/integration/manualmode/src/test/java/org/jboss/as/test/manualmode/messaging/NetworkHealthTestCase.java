@@ -30,10 +30,8 @@ import org.jboss.as.controller.client.helpers.Operations;
 import static org.jboss.as.controller.client.helpers.Operations.isSuccessfulOutcome;
 
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -138,7 +136,7 @@ public class NetworkHealthTestCase {
         Thread.sleep(TimeoutUtil.adjust(2000));
 
         LoggingUtil.dumpTestLog(managementClient, "artemis-log");
-        Files.copy(logFile, Paths.get("C:\\tmp\\artemis.log"), StandardCopyOption.REPLACE_EXISTING);
+//        Files.copy(logFile, Paths.get("C:\\tmp\\artemis.log"), StandardCopyOption.REPLACE_EXISTING);
         Assert.assertFalse("Log contains ActiveMQ ping error log message: [AMQ202002]",
                 LoggingUtil.hasLogMessage(managementClient, "artemis-log", "AMQ202002", restartLine, (line) -> line.contains(IP_ADDRESS)));
         Assert.assertTrue("Broker should be running", isBrokerActive(jmsOperations, managementClient));
