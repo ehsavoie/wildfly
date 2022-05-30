@@ -228,7 +228,7 @@ public class NetworkHealthTestCase {
 
         @Override
         public Collection<String> getCategories() {
-            return Arrays.asList("org.apache.activemq.artemis.logs");
+            return Arrays.asList("org.apache.activemq.artemis");
         }
 
         @Override
