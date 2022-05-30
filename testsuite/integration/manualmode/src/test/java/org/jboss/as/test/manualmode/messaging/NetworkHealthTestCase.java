@@ -230,7 +230,7 @@ public class NetworkHealthTestCase {
 
         @Override
         public String getLevel() {
-            return "INFO";
+            return "TRACE";
         }
 
         @Override

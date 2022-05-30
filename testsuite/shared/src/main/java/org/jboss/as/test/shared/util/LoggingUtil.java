@@ -144,6 +144,7 @@ public class LoggingUtil {
     }
 
     private static void dumpTestLog(Path logPath) throws IOException {
+        System.out.println("*********************************************************************");
         try (BufferedReader fileReader = Files.newBufferedReader(logPath, StandardCharsets.UTF_8)) {
             String line = "";
             while ((line = fileReader.readLine()) != null) {
