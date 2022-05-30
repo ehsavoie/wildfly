@@ -138,7 +138,7 @@ public class NetworkHealthTestCase {
         Thread.sleep(TimeoutUtil.adjust(2000));
 
         LoggingUtil.dumpTestLog(managementClient, "artemis-log");
-        Files.copy(logFile, Paths.get("file://C:\\tmp\\artemis.log"), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(logFile, Paths.get("C:\\tmp\\artemis.log"), StandardCopyOption.REPLACE_EXISTING);
         Assert.assertFalse("Log contains ActiveMQ ping error log message: [AMQ202002]",
                 LoggingUtil.hasLogMessage(managementClient, "artemis-log", "AMQ202002", restartLine, (line) -> line.contains(IP_ADDRESS)));
         Assert.assertTrue("Broker should be running", isBrokerActive(jmsOperations, managementClient));
