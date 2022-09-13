@@ -68,6 +68,9 @@ public class ManagementUtil {
                 roleNode.get(CREATE_NON_DURABLE_QUEUE.getName()).set((Boolean)role[5]);
                 roleNode.get(DELETE_NON_DURABLE_QUEUE.getName()).set((Boolean)role[6]);
                 roleNode.get(MANAGE.getName()).set((Boolean)role[7]);
+                roleNode.get("browse").set((Boolean)role[8]);
+                roleNode.get("create-address").set((Boolean)role[9]);
+                roleNode.get("delete-address").set((Boolean)role[10]);
             }
         }
         return result;
@@ -95,16 +98,28 @@ public class ManagementUtil {
                 final ModelNode roleNode = result.add();
                 for (Property prop : role.asPropertyList()) {
                     String key = prop.getName();
-                    if ("createDurableQueue".equals(key)) {
-                        key = SecurityRoleDefinition.CREATE_DURABLE_QUEUE.getName();
-                    } else if ("deleteDurableQueue".equals(key)) {
-                        key = SecurityRoleDefinition.DELETE_DURABLE_QUEUE.getName();
-                    } else if ("createNonDurableQueue".equals(key)) {
-                        key = SecurityRoleDefinition.CREATE_NON_DURABLE_QUEUE.getName();
-                    } else if ("deleteNonDurableQueue".equals(key)) {
-                        key = SecurityRoleDefinition.DELETE_NON_DURABLE_QUEUE.getName();
+                    if (null != key) switch (key) {
+                        case "createDurableQueue":
+                            key = SecurityRoleDefinition.CREATE_DURABLE_QUEUE.getName();
+                            break;
+                        case "deleteDurableQueue":
+                            key = SecurityRoleDefinition.DELETE_DURABLE_QUEUE.getName();
+                            break;
+                        case "createNonDurableQueue":
+                            key = SecurityRoleDefinition.CREATE_NON_DURABLE_QUEUE.getName();
+                            break;
+                        case "deleteNonDurableQueue":
+                            key = SecurityRoleDefinition.DELETE_NON_DURABLE_QUEUE.getName();
+                            break;
+                        case "createAddress":
+                            key = "create-address";
+                            break;
+                        case "deleteAddress":
+                            key = "delete-address";
+                            break;
+                        default:
+                            break;
                     }
-
                     roleNode.get(key).set(prop.getValue());
                 }
             }
