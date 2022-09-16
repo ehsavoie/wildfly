@@ -145,6 +145,7 @@ class AddressSettingAdd extends AbstractAddStepHandler {
         if (config.hasDefined(AddressSettingDefinition.SLOW_CONSUMER_THRESHOLD.getName())) {
             settings.setSlowConsumerThreshold(AddressSettingDefinition.SLOW_CONSUMER_THRESHOLD.resolveModelAttribute(context, config).asLong());
         }
+        settings.setMaxReadPageBytes(-1);
         return settings;
     }
 
