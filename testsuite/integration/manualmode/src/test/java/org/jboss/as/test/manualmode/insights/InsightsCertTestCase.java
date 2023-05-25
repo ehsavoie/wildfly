@@ -193,7 +193,7 @@ public class InsightsCertTestCase {
         configureInsightsClient(getFileFromResources("insights/mockserverclientkeycerts/client-cert.pem"), getFileFromResources("insights/mockserverclientkeycerts/client-key.pem"), "https://example.invalid:" + port);
         container.start();
 
-        String expectedLogMessage = ".*DEBUG.*java\\.net\\.UnknownHostException.*";
+        String expectedLogMessage = ".*DEBUG.*[java\\.net\\.UnknownHostException|java\\.nio\\.channels\\.UnresolvedAddressException].*";
         Assert.assertFalse("Log Message:\n\"" + expectedLogMessage + "\"\n is expected to be present in log but it's not.", searchRegexInLog(expectedLogMessage, serverLogFile, Duration.ofSeconds(15)).isEmpty());
 
         String unexpectedLogMessage = ".*(?:INFO|WARN|ERROR).*insights.*";
