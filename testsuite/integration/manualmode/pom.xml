@@ -373,6 +373,12 @@
             <artifactId>jakarta.mail-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
+            <scope>test</scope>
+            <version>2.0.2</version>
+        </dependency>
 
     </dependencies>
 
