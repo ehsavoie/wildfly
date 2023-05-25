@@ -778,6 +778,17 @@
             </dependency>
             <dependency>
                 <groupId>${ee.maven.groupId}</groupId>
+                <artifactId>jboss-insights</artifactId>
+                <version>${ee.maven.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${ee.maven.groupId}</groupId>
                 <artifactId>wildfly-jacorb</artifactId>
                 <version>${ee.maven.version}</version>
             </dependency>

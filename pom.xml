@@ -82,7 +82,8 @@
         <module>elytron-oidc-client</module>
         <module>galleon-pack</module>
         <module>health</module>
-        <module>iiop-openjdk</module>
+    	<module>iiop-openjdk</module>
+    	<module>insights</module>
         <module>jaxrs</module>
         <module>jdr</module>
         <module>jpa</module>
@@ -388,6 +389,7 @@
         <version.com.ibm.async.asyncutil>0.1.0</version.com.ibm.async.asyncutil>
         <version.com.microsoft.azure>8.6.6</version.com.microsoft.azure>
         <version.com.nimbus.jose-jwt>9.24.4</version.com.nimbus.jose-jwt>
+        <version.com.redhat.insights>1.0.6</version.com.redhat.insights>
         <version.com.squareup.okhttp>4.10.0</version.com.squareup.okhttp>
         <legacy.version.com.squareup.okhttp>3.14.9</legacy.version.com.squareup.okhttp>
         <version.com.squareup.okio-jvm>3.2.0</version.com.squareup.okio-jvm>
@@ -914,6 +916,30 @@
                 <artifactId>wildfly-release</artifactId>
                 <version>${full.maven.version}</version>
                 <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>com.redhat.insights</groupId>
+                <artifactId>runtimes-java-api</artifactId>
+                <version>${version.com.redhat.insights}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.redhat.insights</groupId>
+                <artifactId>runtimes-java-core-runtime</artifactId>
+                <version>${version.com.redhat.insights}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

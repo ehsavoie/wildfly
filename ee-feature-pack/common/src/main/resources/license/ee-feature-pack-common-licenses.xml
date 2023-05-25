@@ -313,6 +313,28 @@
       </licenses>
     </dependency>
     <dependency>
+      <groupId>com.redhat.insights</groupId>
+      <artifactId>runtimes-java-api</artifactId>
+      <licenses>
+        <license>
+          <name>Apache License 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>com.redhat.insights</groupId>
+      <artifactId>runtimes-java-core-runtime</artifactId>
+      <licenses>
+        <license>
+          <name>Apache License 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
       <groupId>com.sun.faces</groupId>
       <artifactId>jsf-impl</artifactId>
       <licenses>
@@ -2198,6 +2220,17 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jipijapa-eclipselink</artifactId>
+      <licenses>
+        <license>
+          <name>GNU Lesser General Public License v2.1 or later</name>
+          <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1-standalone.html</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.eap</groupId>
+      <artifactId>:jboss-insights</artifactId>
       <licenses>
         <license>
           <name>GNU Lesser General Public License v2.1 or later</name>
