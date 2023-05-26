@@ -43,7 +43,7 @@ public class InsightsFileWriterClientTestCase extends AbstractInsightsClientTest
     private static final String UPDATE_REQUEST = "_update.json";
 
     // I4ASR0019 - all clients failed
-    public static Pattern INSIGHTS_DEBUG_ALL_CLIENTS_FAILED = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*I4ASR0019.*InsightsApacheHttpClient.*InsightsFileWritingClient.*");
+    public static Pattern INSIGHTS_DEBUG_ALL_CLIENTS_FAILED = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*I4ASR0019.*InsightsJdkHttpClient.*InsightsFileWritingClient.*");
     public static Pattern INSIGHTS_IWE_PATTERN = Pattern.compile(".*(INFO|WARN|ERROR) \\[org.jboss.eap.insights.report\\].*");
 
     @BeforeClass
@@ -81,7 +81,7 @@ public class InsightsFileWriterClientTestCase extends AbstractInsightsClientTest
         try {
             insightsLogTailer = Tailer.create(serverLogFile.toFile(), listener, 200, true);
             container.start();
-            Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(20)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
+            Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(30)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
             Assert.assertFalse("There should be no INFO, WARN or ERROR logs from Insights.", listener.foundMatchForPattern(INSIGHTS_IWE_PATTERN));
         } finally {
             setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", uploadDirOriginal);

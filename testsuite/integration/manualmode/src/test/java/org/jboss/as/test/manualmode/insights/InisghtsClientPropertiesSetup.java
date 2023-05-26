@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.jboss.as.test.integration.management.util.ModelUtil.createOpNode;
+import static org.jboss.as.test.manualmode.insights.AbstractInsightsClientTestCase.CLIENT_MAX_RETRY;
 
 public class InisghtsClientPropertiesSetup implements ServerSetupTask {
 
@@ -53,6 +54,7 @@ public class InisghtsClientPropertiesSetup implements ServerSetupTask {
     public void setup(ManagementClient managementClient) throws Exception {
         final ModelControllerClient controllerClient = managementClient.getControllerClient();
         addProperty(controllerClient, "rht.insights.java.upload.base.url", MOCK_URL);
+        addProperty(controllerClient, CLIENT_MAX_RETRY, "1");
         setupCertAndKeyProperties(controllerClient);
 
         setupInsightsLogger(controllerClient);
@@ -63,12 +65,14 @@ public class InisghtsClientPropertiesSetup implements ServerSetupTask {
         Files.createDirectories(JAVA_ARCHIVE_UPLOAD_DIR);
         final ModelControllerClient controllerClient = managementClient.getControllerClient();
         addProperty(controllerClient, "rht.insights.java.archive.upload.dir", JAVA_ARCHIVE_UPLOAD_DIR.toString());
+        addProperty(controllerClient, CLIENT_MAX_RETRY, "1");
         setupCertAndKeyProperties(controllerClient);
         setupInsightsLogger(controllerClient);
     }
 
     public  void setupTokenHttp(ManagementClient managementClient) throws Exception {
         final ModelControllerClient controllerClient = managementClient.getControllerClient();
+        addProperty(controllerClient, CLIENT_MAX_RETRY, "1");
         addProperty(controllerClient, "rht.insights.java.upload.base.url", System.getProperty("test.insights.java.upload.base.url", MOCK_URL));
         addProperty(controllerClient,"rht.insights.java.auth.token", System.getProperty("test.insights.java.auth.token", MOCK_TOKEN));
 

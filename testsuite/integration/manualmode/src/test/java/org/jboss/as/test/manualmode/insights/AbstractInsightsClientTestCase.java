@@ -44,10 +44,11 @@ public abstract class AbstractInsightsClientTestCase {
     public static final String OPT_OUT_PROPERTY = "rht.insights.java.opt.out";
     public static final String CONNECT_PERIOD_PROPERTY = "rht.insights.java.connect.period";
     public static final String UPDATE_PERIOD_PROPERTY = "rht.insights.java.update.period";
+    public static final String CLIENT_MAX_RETRY = "rht.insights.java.http.client.retry.max.attempts";
 
     public static final String MODULES_JAR = "jboss-modules.jar";
     public static final String REPORT_VERSION = "1.0.0";
-    public static final String CONFIGURATION_REPORT_VERSION = "16.0.0";
+    public static final String CONFIGURATION_REPORT_VERSION = "21.0.0";
 
     @Inject
     protected static ServerController container;
@@ -114,8 +115,13 @@ public abstract class AbstractInsightsClientTestCase {
         // EAP specific sub-reports start here
         JsonNode eapReport = request.getPayload().get("eap");
         assertNotNull("No eap report", eapReport);
-        assertEquals("Incorrect product name in the EAP sub-report.", "Red Hat JBoss EAP", eapReport.get("name").asText());
+        // TODO UNCOMMENT WHEN TESTING AGAINST JBOSS-EAP
+//        assertEquals("Incorrect product name in the EAP sub-report.", "Red Hat JBoss EAP", eapReport.get("name").asText());
+//        assertEquals("Incorrect EAP sub-report version.", REPORT_VERSION, eapReport.get("version").asText());
+        // TODO AND DELETE THOSE 2 LINES
+        assertEquals("Incorrect product name in the EAP sub-report.", "Red Hat WildFly Full", eapReport.get("name").asText());
         assertEquals("Incorrect EAP sub-report version.", REPORT_VERSION, eapReport.get("version").asText());
+
         assertFieldDefined(eapReport, "EAP", "eap-version");
         assertFieldPresent(eapReport, "EAP","eap-installation");
         JsonNode eapInstallation = eapReport.get("eap-installation");
@@ -155,10 +161,10 @@ public abstract class AbstractInsightsClientTestCase {
         String deploymentName = "dummy.jar";
         try {
             container.start();
-            awaitConnect(10);
+            awaitConnect(20);
             InsightsRequest firstConnect = getConnect();
             cleanRequests();
-            awaitConnect(10);
+            awaitConnect(20);
             InsightsRequest secondConnect = getConnect();
             assertEquals(firstConnect.getPayload().get("basic").get("jvm.pid"), secondConnect.getPayload().get("basic").get("jvm.pid"));
             assertNotEquals(firstConnect.getPayload().get("basic").get("jvm.report_time"), secondConnect.getPayload().get("basic").get("jvm.report_time"));
@@ -166,6 +172,9 @@ public abstract class AbstractInsightsClientTestCase {
             assertEquals(firstConnect.getPayload().get("eap").get("eap-deployments"), secondConnect.getPayload().get("eap").get("eap-deployments"));
 
             container.deploy(getJarDeployment(deploymentName), deploymentName);
+            // clean requests twice here as it might happen that report gets generated at the time of cleaning and might not contain deployment yettestNoBinary
+            cleanRequests();
+            awaitConnect(10);
             cleanRequests();
             awaitConnect(10);
             InsightsRequest thirdConnect = getConnect();

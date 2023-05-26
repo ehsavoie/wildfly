@@ -19,29 +19,43 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.input.Tailer;
 import org.awaitility.Awaitility;
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.mock.action.ExpectationResponseCallback;
-import org.mockserver.model.*;
+import org.mockserver.model.Header;
+import org.mockserver.model.HttpClassCallback;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.HttpStatusCode;
+import org.mockserver.model.StringBody;
 import org.mockserver.verify.VerificationTimes;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import static org.jboss.as.test.manualmode.insights.InisghtsClientPropertiesSetup.JAVA_ARCHIVE_UPLOAD_DIR;
 import static org.jboss.as.test.manualmode.insights.InisghtsClientPropertiesSetup.MACHINE_ID_FILE_PATH_PROPERTY;
 import static org.jboss.as.test.manualmode.insights.InsightsFileWriterClientTestCase.INSIGHTS_DEBUG_ALL_CLIENTS_FAILED;
 import static org.jboss.as.test.manualmode.insights.InsightsFileWriterClientTestCase.INSIGHTS_IWE_PATTERN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.verify.VerificationTimes.exactly;
 
 public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
 
     public static Pattern INSIGHTS_HTTP_ERROR_PATTERN = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*HttpHostConnectException.*");
-    public static Pattern INSIGHTS_CLIENT_FAILED_PATTERN = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*WFLYINSIGHTS0008.*");
+    public static Pattern INSIGHTS_HTTP_REQUEST_TIMEOUT_ERROR = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*HttpTimeoutException.*");
+    public static Pattern INSIGHTS_CLIENT_FAILED_PATTERN = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*I4ASR0023.*");
     public static Pattern INSIGHTS_LOG_PATTERN = Pattern.compile(".*org.jboss.eap.insights.report.*");
     public static Pattern INSIGHTS_CLIENTS_NOT_READY = Pattern.compile(".*DEBUG \\[org.jboss.eap.insights.report\\].*Insights is not configured to send: JBossInsightsConfiguration.*");
 
@@ -59,7 +73,6 @@ public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
             .withMethod("POST")
             .withPath("/api/ingress/v1/upload")
             .withHeaders(
-                    Header.header("Accept-Encoding", "gzip,deflate"),
                     Header.header("Content-Type", "multipart/form-data.*")
             )
             .withBody(StringBody.subString("_connect.gz"));
@@ -68,12 +81,11 @@ public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
             .withMethod("POST")
             .withPath("/api/ingress/v1/upload")
             .withHeaders(
-                    Header.header("Accept-Encoding", "gzip,deflate"),
                     Header.header("Content-Type", "multipart/form-data.*")
             )
             .withBody(StringBody.subString("_update.gz"));
 
-    private static final HttpResponse MOCK_RESPONSE_ACCEPTED = HttpResponse.response()
+    private static final HttpResponse MOCK_RESPONSE_ACCEPTED = response()
             .withStatusCode(HttpStatusCode.ACCEPTED_202.code())
             .withBody("ACCEPTED");
 
@@ -104,35 +116,64 @@ public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
     }
 
     @Test
-    public void testServerNotResponding() {
-        mockServer.stop();
+    public void testServerNotResponding() throws Exception {
+        mockServer.reset();
+        mockServer.withSecure(true).when(CONNECT_REQUEST)
+                .respond(
+                        response()
+                                .withBody("some_response_body")
+                                .withDelay(TimeUnit.SECONDS, 10000)
+                );
+        container.startInAdminMode();
+        final ModelControllerClient controllerClient = container.getClient().getControllerClient();
+        String uploadDirOriginal = setupTask.readProperty(controllerClient, "rht.insights.java.archive.upload.dir");
+        setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", JAVA_ARCHIVE_UPLOAD_DIR.resolve("nonexistent").toString());
+        setupTask.addProperty(controllerClient, "rht.insights.java.http.client.timeout", Duration.ofSeconds(1).toString());
+        container.stop();
         InsightsLogListener listener = new InsightsLogListener(
                 INSIGHTS_HTTP_ERROR_PATTERN,
                 INSIGHTS_DEBUG_ALL_CLIENTS_FAILED,
-                INSIGHTS_IWE_PATTERN);
-        Tailer insightsLogTailer = Tailer.create(serverLogFile.toFile(), listener, 200, true);
-        container.start();
-        Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(10)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
-        listener.assertPatternMatched(INSIGHTS_HTTP_ERROR_PATTERN);
-        Assert.assertFalse("There should be no INFO, WARN or ERROR logs from Insights.", listener.foundMatchForPattern(INSIGHTS_IWE_PATTERN));
-        insightsLogTailer.stop();
-        container.stop();
+                INSIGHTS_IWE_PATTERN,
+                INSIGHTS_HTTP_REQUEST_TIMEOUT_ERROR);
+        Tailer insightsLogTailer = null;
+        try {
+            insightsLogTailer = Tailer.create(serverLogFile.toFile(), listener, 200, true);
+            container.start();
+            Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(30)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
+            listener.assertPatternMatched(INSIGHTS_HTTP_REQUEST_TIMEOUT_ERROR);
+            Assert.assertFalse("There should be no INFO, WARN or ERROR logs from Insights.", listener.foundMatchForPattern(INSIGHTS_IWE_PATTERN));
+        } finally {
+            setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", uploadDirOriginal);
+            setupTask.removeProperty(controllerClient, "rht.insights.java.http.client.timeout");
+            insightsLogTailer.stop();
+            container.stop();
+        }
     }
 
     @Test
-    public void testPayloadNotAccepted() {
+    public void testPayloadNotAccepted() throws Exception {
+        container.startInAdminMode();
+        final ModelControllerClient controllerClient = container.getClient().getControllerClient();
+        String uploadDirOriginal = setupTask.readProperty(controllerClient, "rht.insights.java.archive.upload.dir");
+        setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", JAVA_ARCHIVE_UPLOAD_DIR.resolve("nonexistent").toString());
+        container.stop();
         mockServer.reset();
         InsightsLogListener listener = new InsightsLogListener(
                 INSIGHTS_CLIENT_FAILED_PATTERN,
                 INSIGHTS_DEBUG_ALL_CLIENTS_FAILED,
                 INSIGHTS_IWE_PATTERN);
-        Tailer insightsLogTailer = Tailer.create(serverLogFile.toFile(),listener, 200, true);
-        container.start();
-        Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(10)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
-        listener.assertPatternMatched(INSIGHTS_CLIENT_FAILED_PATTERN);
-        Assert.assertFalse("There should be no INFO, WARN or ERROR logs from Insights.", listener.foundMatchForPattern(INSIGHTS_IWE_PATTERN));
-        insightsLogTailer.stop();
-        container.stop();
+        Tailer insightsLogTailer = null;
+        try {
+            insightsLogTailer = Tailer.create(serverLogFile.toFile(), listener, 200, true);
+            container.start();
+            Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(30)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
+            listener.assertPatternMatched(INSIGHTS_CLIENT_FAILED_PATTERN);
+            Assert.assertFalse("There should be no INFO, WARN or ERROR logs from Insights.", listener.foundMatchForPattern(INSIGHTS_IWE_PATTERN));
+        } finally {
+            setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", uploadDirOriginal);
+            insightsLogTailer.stop();
+            container.stop();
+        }
     }
 
     @Test
@@ -147,6 +188,8 @@ public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
         setupTask.addProperty(controllerClient, "rht.insights.java.key.file.path", unreadableFile.toString());
         setupTask.addProperty(controllerClient, "rht.insights.java.cert.file.path", unreadableFile.toString());
         setupTask.addProperty(controllerClient, "rht.insights.java.cert.helper.binary", "/nonexistent/binary/path");
+        String uploadDirOriginal = setupTask.readProperty(controllerClient, "rht.insights.java.archive.upload.dir");
+        setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", JAVA_ARCHIVE_UPLOAD_DIR.resolve("nonexistent").toString());
         container.stop();
 
         InsightsLogListener listener = new InsightsLogListener(
@@ -156,12 +199,13 @@ public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
         try {
             insightsLogTailer = Tailer.create(serverLogFile.toFile(),listener, 200, true);
             container.start();
-            Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(10)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
+            Awaitility.await("Waiting for client failure.").atMost(Duration.ofSeconds(30)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_DEBUG_ALL_CLIENTS_FAILED));
             Assert.assertFalse("There should be no INFO, WARN or ERROR logs from Insights.", listener.foundMatchForPattern(INSIGHTS_IWE_PATTERN));
         } finally {
             setupTask.addProperty(controllerClient, "rht.insights.java.key.file.path", originalKeyFilePath);
             setupTask.addProperty(controllerClient, "rht.insights.java.cert.file.path", originalCertFilePath);
             setupTask.addProperty(controllerClient, "rht.insights.java.cert.helper.binary", originalBinary);
+            setupTask.addProperty(controllerClient, "rht.insights.java.archive.upload.dir", uploadDirOriginal);
             container.stop();
             insightsLogTailer.stop();
         }
@@ -180,8 +224,7 @@ public class InsightsHttpClientTestCase extends AbstractInsightsClientTestCase {
         try {
             insightsLogTailer = Tailer.create(serverLogFile.toFile(),listener, 200, true);
             container.start();
-            Thread.sleep(2000);
-            listener.assertPatternMatched(INSIGHTS_CLIENTS_NOT_READY);
+            Awaitility.await("Waiting for Insights clients not ready.").atMost(Duration.ofSeconds(5)).untilAsserted(() -> listener.assertPatternMatched(INSIGHTS_CLIENTS_NOT_READY));
             assertEquals("There should be just a single debug message when clients are not ready. But there was: " + listener.getMatchedLines(), 1, listener.getMatchedLines().size());
         } finally {
             insightsLogTailer.stop();

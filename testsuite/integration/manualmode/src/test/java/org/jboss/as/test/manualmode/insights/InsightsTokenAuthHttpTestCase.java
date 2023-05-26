@@ -17,6 +17,11 @@ package org.jboss.as.test.manualmode.insights;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.awaitility.Awaitility;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.client.helpers.Operations;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.dmr.ModelNode;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -26,8 +31,15 @@ import org.mockserver.mock.action.ExpectationResponseCallback;
 import org.mockserver.model.*;
 import org.mockserver.verify.VerificationTimes;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.stream.Collectors;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockserver.verify.VerificationTimes.exactly;
@@ -40,7 +52,6 @@ public class InsightsTokenAuthHttpTestCase extends AbstractInsightsClientTestCas
             .withMethod("POST")
             .withPath("/api/ingress/v1/upload")
             .withHeaders(
-                    Header.header("Accept-Encoding", "gzip,deflate"),
                     Header.header("Content-Type", "multipart/form-data.*"),
                     Header.header("Authorization", "Basic " + InisghtsClientPropertiesSetup.MOCK_TOKEN)
             )
@@ -50,7 +61,6 @@ public class InsightsTokenAuthHttpTestCase extends AbstractInsightsClientTestCas
             .withMethod("POST")
             .withPath("/api/ingress/v1/upload")
             .withHeaders(
-                    Header.header("Accept-Encoding", "gzip,deflate"),
                     Header.header("Content-Type", "multipart/form-data.*"),
                     Header.header("Authorization", "Basic " + InisghtsClientPropertiesSetup.MOCK_TOKEN)
             )
@@ -75,7 +85,7 @@ public class InsightsTokenAuthHttpTestCase extends AbstractInsightsClientTestCas
     }
 
     @Before
-    public void startMockServer() {
+    public void startMockServer() throws IOException {
         mockServer = ClientAndServer.startClientAndServer(1080);
         setupMockServerExpectations();
     }
