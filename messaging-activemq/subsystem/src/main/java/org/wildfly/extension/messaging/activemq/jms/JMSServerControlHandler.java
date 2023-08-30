@@ -19,6 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.wildfly.extension.messaging.activemq.jms;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
@@ -50,7 +51,6 @@ import org.apache.activemq.artemis.api.core.management.ActiveMQServerControl;
 import org.apache.activemq.artemis.api.core.management.QueueControl;
 import org.apache.activemq.artemis.api.core.management.ResourceNames;
 import org.apache.activemq.artemis.core.server.ActiveMQServer;
-import org.apache.activemq.artemis.core.server.ServerProducer;
 import org.apache.activemq.artemis.core.server.ServerSession;
 import org.jboss.as.controller.AbstractRuntimeOnlyHandler;
 import org.jboss.as.controller.AttributeDefinition;
@@ -123,7 +123,8 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
 
                 final JsonArrayBuilder enrichedConnections = Json.createArrayBuilder();
                 try (
-                        JsonReader reader = Json.createReader(new StringReader(json));) {
+                        JsonReader reader = Json.createReader(new StringReader(json));
+                ) {
                     final JsonArray connections = reader.readArray();
 
                     for (int i = 0; i < connections.size(); i++) {
@@ -142,7 +143,8 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
 
                 final JsonArrayBuilder enrichedConsumers = Json.createArrayBuilder();
                 try (
-                        JsonReader reader = Json.createReader(new StringReader(json));) {
+                        JsonReader reader = Json.createReader(new StringReader(json));
+                ) {
                     final JsonArray consumers = reader.readArray();
 
                     for (int i = 0; i < consumers.size(); i++) {
@@ -160,7 +162,8 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
 
                 final JsonArrayBuilder enrichedConsumers = Json.createArrayBuilder();
                 try (
-                        JsonReader reader = Json.createReader(new StringReader(json));) {
+                        JsonReader reader = Json.createReader(new StringReader(json));
+                ) {
                     final JsonArray consumers = reader.readArray();
 
                     for (int i = 0; i < consumers.size(); i++) {
@@ -184,12 +187,8 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
                 // Artemis no longer defines the method. Its implementation from Artemis 1.5 has been inlined:
                 ServerSession session = server.getSessionByID(sessionID);
                 if (session != null) {
-                    for (ServerProducer producer : session.getServerProducers()) {
-                        if (addressName.equals(producer.getAddress())) {
-                            context.getResult().set(producer.getLastProducedMessageID().toString());
-                            break;
-                        }
-                    }
+                    String messageID = session.getLastSentMessageID(addressName);
+                    context.getResult().set(messageID);
                 }
             } else if (GET_SESSION_CREATION_TIME.equals(operationName)) {
                 String sessionID = SESSION_ID.resolveModelAttribute(context, operation).asString();
@@ -224,11 +223,7 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
         JsonObjectBuilder enrichedConsumer = Json.createObjectBuilder();
 
         for (Map.Entry<String, JsonValue> entry : originalConsumer.entrySet()) {
-            if("lastProducedMessageID".equals(entry.getKey())) {
-                enrichedConsumer.add("lastUUIDSent", entry.getValue());
-            } else {
-                enrichedConsumer.add(entry.getKey(), entry.getValue());
-            }
+            enrichedConsumer.add(entry.getKey(), entry.getValue());
         }
         String queueName = originalConsumer.getString("queueName");
         final QueueControl queueControl = QueueControl.class.cast(server.getManagementService().getResource(ResourceNames.QUEUE + queueName));
@@ -340,17 +335,18 @@ public class JMSServerControlHandler extends AbstractRuntimeOnlyHandler {
         if (session == null) {
             return new String[0];
         }
+        String[] addresses = session.getTargetAddresses();
         Map<String, QueueControl> allDests = new HashMap<>();
 
         Object[] queueControls = server.getManagementService().getResources(QueueControl.class);
         for (Object queue : queueControls) {
-            QueueControl queueControl = (QueueControl) queue;
+            QueueControl queueControl = (QueueControl)queue;
             allDests.put(queueControl.getAddress(), queueControl);
         }
 
         List<String> destinations = new ArrayList<>();
-        for (ServerProducer producer : session.getServerProducers()) {
-            QueueControl control = allDests.get(producer.getAddress());
+        for (String addresse : addresses) {
+            QueueControl control = allDests.get(addresse);
             if (control != null) {
                 destinations.add(control.getAddress());
             }
