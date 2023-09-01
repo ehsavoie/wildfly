@@ -33,8 +33,10 @@ import static org.wildfly.extension.metrics._private.MetricsLogger.LOGGER;
 import java.util.OptionalDouble;
 
 import org.jboss.as.controller.LocalModelControllerClient;
+import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 
 public class WildFlyMetric implements Metric {
@@ -67,6 +69,16 @@ public class WildFlyMetric implements Metric {
         }
         return OptionalDouble.empty();
     }
+
+    public ModelNode getValue(OperationContext context) {
+        try {
+            return context.readResourceFromRoot(address, false).getModel().get(attributeName);
+        } catch (Resource.NoSuchResourceException ex) {
+            //ignore
+        }
+        return UNDEFINED;
+    }
+    
 
     private ModelNode readAttributeValue(PathAddress address, String attributeName) {
         final ModelNode readAttributeOp = new ModelNode();
