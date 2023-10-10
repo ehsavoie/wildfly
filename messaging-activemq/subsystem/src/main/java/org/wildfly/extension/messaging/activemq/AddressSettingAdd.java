@@ -60,9 +60,8 @@ class AddressSettingAdd extends AbstractAddStepHandler {
      * Create a setting.
      *
      * @param context the operation context
-     * @param config the detyped config
+     * @param config  the detyped config
      * @return the address settings
-     *
      * @throws OperationFailedException if the model is invalid
      */
     static AddressSettings createSettings(final OperationContext context, final ModelNode config) throws OperationFailedException {
@@ -76,10 +75,21 @@ class AddressSettingAdd extends AbstractAddStepHandler {
         settings.setAutoDeleteJmsQueues(AddressSettingDefinition.AUTO_DELETE_JMS_QUEUES.resolveModelAttribute(context, config).asBoolean());
         settings.setAutoCreateQueues(AddressSettingDefinition.AUTO_CREATE_QUEUES.resolveModelAttribute(context, config).asBoolean());
         settings.setAutoDeleteQueues(AddressSettingDefinition.AUTO_DELETE_QUEUES.resolveModelAttribute(context, config).asBoolean());
-        settings.setAutoCreateAddresses(AddressSettingDefinition.AUTO_CREATE_ADDRESSES.resolveModelAttribute(context, config).asBoolean());
-        settings.setAutoDeleteAddresses(AddressSettingDefinition.AUTO_DELETE_ADDRESSES.resolveModelAttribute(context, config).asBoolean());
-        settings.setAutoDeleteCreatedQueues(AddressSettingDefinition.AUTO_DELETE_CREATED_QUEUES.resolveModelAttribute(context, config).asBoolean());
-        settings.setMaxReadPageBytes(AddressSettingDefinition.MAX_READ_PAGE_BYTES.resolveModelAttribute(context, config).asInt());
+
+        // Internally AddressSettings use the null values for attributes as special value, for example when merging with a different config
+        //  Thus we have to check if the value is defined before setting it (We do not want to set default value here)
+        if (config.hasDefined(AddressSettingDefinition.AUTO_CREATE_ADDRESSES.getName())) {
+            settings.setAutoCreateAddresses(AddressSettingDefinition.AUTO_CREATE_ADDRESSES.resolveModelAttribute(context, config).asBoolean());
+        }
+        if (config.hasDefined(AddressSettingDefinition.AUTO_DELETE_ADDRESSES.getName())) {
+            settings.setAutoDeleteAddresses(AddressSettingDefinition.AUTO_DELETE_ADDRESSES.resolveModelAttribute(context, config).asBoolean());
+        }
+        if (config.hasDefined(AddressSettingDefinition.AUTO_DELETE_CREATED_QUEUES.getName())) {
+            settings.setAutoDeleteCreatedQueues(AddressSettingDefinition.AUTO_DELETE_CREATED_QUEUES.resolveModelAttribute(context, config).asBoolean());
+        }
+        if (config.hasDefined(AddressSettingDefinition.MAX_READ_PAGE_BYTES.getName())) {
+            settings.setMaxReadPageBytes(AddressSettingDefinition.MAX_READ_PAGE_BYTES.resolveModelAttribute(context, config).asInt());
+        }
         if (config.hasDefined(DEAD_LETTER_ADDRESS.getName())) {
             settings.setDeadLetterAddress(asSimpleString(DEAD_LETTER_ADDRESS.resolveModelAttribute(context, config), null));
         }
