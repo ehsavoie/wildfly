@@ -39,6 +39,8 @@ public class AddressSettingsTestCase extends ContainerResourceMgmtTestBase {
     private static final String ACTIVEMQ_ADDRESS = "activemq-address";
     private static final String MESSAGE_COUNTER_HISTORY_DAY_LIMIT = "message-counter-history-day-limit";
     private static final String RESOLVE_ADDRESS_SETTING = "resolve-address-setting";
+    private static final String MAX_READ_PAGE_BYTES = "max-read-page-bytes";
+    private static final String PAGE_SIZE_BYTES = "page-size-bytes";
 
     private ModelNode defaultAddress;
     private ModelNode intermediateAddress;
@@ -108,7 +110,11 @@ public class AddressSettingsTestCase extends ContainerResourceMgmtTestBase {
         ModelNode result = executeOperation(resolve);
 
         for (String attributeName : attributeNames) {
-            assertEquals("unexpected value for " + attributeName, defaultAddressSetting.get(attributeName), result.get(attributeName));
+            if (attributeName.equals(MAX_READ_PAGE_BYTES)) {
+                assertEquals("unexpected value for " + attributeName, result.get(PAGE_SIZE_BYTES).asInt() * 2, result.get(attributeName).asInt());
+            } else {
+                assertEquals("unexpected value for " + attributeName, defaultAddressSetting.get(attributeName), result.get(attributeName));
+            }
         }
     }
 
