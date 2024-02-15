@@ -202,7 +202,7 @@ public class ActiveMQServerControlHandler extends AbstractRuntimeOnlyHandler {
             } else if (GET_ADDRESS_SETTINGS_AS_JSON.equals(operationName)) {
                 String addressMatch = ADDRESS_MATCH.resolveModelAttribute(context, operation).asString();
                 String json = serverControl.getAddressSettingsAsJSON(addressMatch);
-                context.getResult().set(json);
+                context.getResult().set(ManagementUtil.convertAddressSettingInfosAsJSON(json));
             } else if (FORCE_FAILOVER.equals(operationName)) {
                 serverControl.forceFailover();
                 context.getResult();

@@ -113,4 +113,32 @@ public class ManagementUtil {
 
         return result;
     }
+
+    /**
+     *  Utility for converting new address settings infos to the old format.
+     */
+    static String convertAddressSettingInfosAsJSON(final String infosAsJSON) {
+        ModelNode camelCase = ModelNode.fromJSONString(infosAsJSON);
+        final ModelNode result = new ModelNode();
+        result.setEmptyObject();
+        if (camelCase.isDefined()) {
+            for (ModelNode role : camelCase.asList()) {
+                for (Property prop : role.asPropertyList()) {
+                    String key = prop.getName();
+                    if (null != key) switch (key) {
+                        case "deadLetterAddress":
+                            key = "DLA";
+                            break;
+                        case "defaultLastValueQueue":
+                            key = "lastValueQueue";
+                            break;
+                        default:
+                            break;
+                    }
+                    result.get(key).set(prop.getValue());
+                }
+            }
+        }
+        return result.toJSONString(false);
+    }
 }
