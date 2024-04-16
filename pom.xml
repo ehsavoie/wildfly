@@ -36,6 +36,7 @@
     </licenses>
 
     <modules>
+        <module>ai</module>
         <module>appclient</module>
         <module>batch-jberet</module>
         <module>bean-validation</module>
@@ -382,6 +383,7 @@
             Properties for dependencies that solely relate to maven plugins go in the plugin section above.
             Properties for dependencies that solely relate to tests go in the test code section above.
          -->
+        <version.ai.djl>0.26.0</version.ai.djl>
         <version.antlr>4.13.0</version.antlr>
         <version.com.carrotsearch.hppc>0.8.1</version.com.carrotsearch.hppc>
         <version.com.fasterxml.classmate>1.5.1</version.com.fasterxml.classmate>
@@ -401,9 +403,12 @@
         <version.com.google.protobuf>3.19.6</version.com.google.protobuf>
         <version.com.h2database>2.2.224</version.com.h2database>
         <version.com.ibm.async.asyncutil>0.1.0</version.com.ibm.async.asyncutil>
+        <version.com.knuddels.jtokkit>1.0.0</version.com.knuddels.jtokkit>
         <version.com.microsoft.azure>8.6.6</version.com.microsoft.azure>
+        <version.com.microsoft.onnxruntime>1.17.1</version.com.microsoft.onnxruntime>
         <version.com.nimbus.jose-jwt>9.37.3</version.com.nimbus.jose-jwt>
         <version.com.squareup.okhttp>4.10.0</version.com.squareup.okhttp>
+        <version.com.squareup.retrofit2>2.9.0</version.com.squareup.retrofit2>
         <legacy.version.com.squareup.okhttp>3.14.9</legacy.version.com.squareup.okhttp>
         <legacy.version.com.squareup.okio>1.17.6</legacy.version.com.squareup.okio>
         <version.com.squareup.okio-jvm>3.4.0</version.com.squareup.okio-jvm>
@@ -415,7 +420,10 @@
         <version.commons-codec>1.15</version.commons-codec>
         <version.commons-collections>3.2.2</version.commons-collections>
         <version.commons-io>2.11.0</version.commons-io>
+        <version.commons-compress>1.26.1</version.commons-compress>
         <version.de.dentrassi.crypto>2.2.2</version.de.dentrassi.crypto>
+        <version.dev.ai4j.openai4j>0.17.0</version.dev.ai4j.openai4j>
+        <version.dev.langchain4j>0.29.1</version.dev.langchain4j>
         <version.gnu.getopt>1.0.13</version.gnu.getopt>
         <version.io.agroal>2.0</version.io.agroal>
         <version.io.grpc>1.58.0</version.io.grpc>
@@ -552,6 +560,7 @@
         <version.org.jboss.ws.spi>5.0.0.Final</version.org.jboss.ws.spi>
         <version.org.jboss.xnio.netty.netty-xnio-transport>0.1.10.Final</version.org.jboss.xnio.netty.netty-xnio-transport>
         <version.org.jctools.jctools-core>2.1.2</version.org.jctools.jctools-core>
+        <version.org.jetbrains.kotlin>1.9.10</version.org.jetbrains.kotlin>
         <version.org.jgroups>5.2.25.Final</version.org.jgroups>
         <version.org.jgroups.aws>3.0.0.Final</version.org.jgroups.aws>
         <version.org.jgroups.azure>2.0.2.Final</version.org.jgroups.azure>

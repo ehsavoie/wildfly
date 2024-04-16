@@ -1,0 +1,13 @@
+<!--
+  ~ Copyright The WildFly Authors
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+
+<subsystem xmlns="urn:jboss:domain:discovery:1.0">
+    <static-provider name="test">
+        <service uri="local://127.0.0.1" abstract-type="ejb" abstract-type-authority="jboss" uri-scheme-authority="test">
+           <attribute name="x" value="y" />
+        </service>
+    </static-provider>
+    <aggregate-provider name="aggregate" providers="test"/>
+</subsystem>

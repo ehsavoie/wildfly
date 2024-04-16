@@ -68,6 +68,7 @@
     <generate-feature-specs>
         <extensions>
             <standalone>
+                <extension>org.wildfly.extension.ai</extension>
                 <extension>org.wildfly.extension.elytron-oidc-client</extension>
                 <extension>org.wildfly.extension.micrometer</extension>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
