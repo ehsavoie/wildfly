@@ -24,8 +24,6 @@ import org.wildfly.subsystem.service.capability.CapabilityServiceInstaller;
 
 /**
  * Configures an aggregate ChatModel provider service.
- *
- * @author Paul Ferraro
  */
 public class ChatModelProviderServiceConfigurator implements ResourceServiceConfigurator {
 

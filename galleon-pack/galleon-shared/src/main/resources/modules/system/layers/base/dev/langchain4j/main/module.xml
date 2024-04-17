@@ -13,14 +13,18 @@
         <artifact name="${dev.langchain4j:langchain4j}"/>
         <artifact name="${dev.langchain4j:langchain4j-core}"/>
         <artifact name="${dev.langchain4j:langchain4j-embeddings}"/>
+        <artifact name="${com.microsoft.onnxruntime:onnxruntime}"/>
+        <artifact name="${ai.djl:api}"/>
+        <artifact name="${ai.djl.huggingface:tokenizers}"/>
+        <artifact name="${net.java.dev.jna:jna}"/>
     </resources>
 
     <dependencies>
         <module name="com.google.code.gson"/>
         <module name="org.slf4j"/>
         <module name="java.logging"/>
-        <module name="dev.langchain4j.embeddings"/>
         <module name="dev.langchain4j.openai" export="true" services="import"/>
         <module name="com.squareup.retrofit2" export="true" services="import"/>
+        <module name="dev.langchain4j.embeddings.all-minilm-l6-v2" optional="true"/>
     </dependencies>
 </module> 

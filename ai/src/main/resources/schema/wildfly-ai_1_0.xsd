@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <!--
-  ~ Copyright The WildFly Authors
-  ~ SPDX-License-Identifier: Apache-2.0
-  -->
+~ Copyright The WildFly Authors
+~ SPDX-License-Identifier: Apache-2.0
+-->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            targetNamespace="urn:jboss:domain:ai:1.0"
@@ -27,27 +27,27 @@
             </xs:documentation>
         </xs:annotation>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="aggregate-provider" type="aggregateType">
+            <xs:element name="chat-model" type="chatModelType">
                 <xs:annotation>
                     <xs:documentation>
-                        An aggregating discovery provider element.
+                        A chat model provider element.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="static-provider" type="staticType">
+            <xs:element name="embedding-model" type="embeddingModelType">
                 <xs:annotation>
                     <xs:documentation>
-                        A static discovery provider definition element.
+                        An embedding-model provider definition element.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:choice>
     </xs:complexType>
 
-    <xs:complexType name="aggregateType">
+    <xs:complexType name="chatModelType">
         <xs:annotation>
             <xs:documentation>
-                A provider which aggregates multiple other providers into one.
+                A provider of chat model.
             </xs:documentation>
         </xs:annotation>
         <xs:attribute name="name" type="xs:string" use="required">
@@ -57,30 +57,36 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="providers" type="providersType" use="optional">
+        <xs:attribute name="base-url" type="xs:string" use="optional">
             <xs:annotation>
                 <xs:documentation>
-                    The list of providers which make up this provider.
+                    The base uril to the chat model endpoint
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="connect-timeout" type="xs:long" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The connection timeout of the chat model
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="temperature" type="xs:double" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The temperature of the chat model
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
 
-    <xs:complexType name="staticType">
+    <xs:complexType name="embeddingModelType">
         <xs:annotation>
             <xs:documentation>
-                A provider which contains a list of static services.
+                A provider of embedding model.
             </xs:documentation>
         </xs:annotation>
-        <xs:choice>
-            <xs:element name="service" type="serviceType" minOccurs="0" maxOccurs="unbounded">
-                <xs:annotation>
-                    <xs:documentation>
-                        A single service definition within the service list.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:choice>
+        
         <xs:attribute name="name" type="xs:string" use="required">
             <xs:annotation>
                 <xs:documentation>
@@ -88,81 +94,19 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-    </xs:complexType>
-
-    <xs:complexType name="serviceType">
-        <xs:annotation>
-            <xs:documentation>
-                A definition of a single static service.
-            </xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded">
-                <xs:annotation>
-                    <xs:documentation>
-                        A single attribute in this attribute list.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="abstract-type" type="xs:string" use="optional">
+        <xs:attribute name="module" type="xs:string" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    The abstract type of the service being advertised.
+                    The module to load the embedding model from.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="abstract-type-authority" type="xs:string" use="optional">
+        <xs:attribute name="embedding-class" type="xs:string" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    The name of the authority which defined the abstract service type.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="uri" type="xs:anyURI" use="required">
-            <xs:annotation>
-                <xs:documentation>
-                    The concrete URI of the service being advertised.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="uri-scheme-authority" type="xs:string" use="optional">
-            <xs:annotation>
-                <xs:documentation>
-                    The name of the authority which defined the concrete URI scheme.
+                    The class from which the embedding model will be instanciated.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
-
-    <xs:complexType name="attributeType">
-        <xs:annotation>
-            <xs:documentation>
-                A service's attribute definition.
-            </xs:documentation>
-        </xs:annotation>
-        <xs:attribute name="name" type="xs:string" use="required">
-            <xs:annotation>
-                <xs:documentation>
-                    The attribute name.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="value" type="xs:string" use="optional">
-            <xs:annotation>
-                <xs:documentation>
-                    The attribute value.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-    </xs:complexType>
-
-    <xs:simpleType name="providersType">
-        <xs:annotation>
-            <xs:documentation>
-                A list of providers.
-            </xs:documentation>
-        </xs:annotation>
-        <xs:list itemType="xs:string"/>
-    </xs:simpleType>
 </xs:schema>

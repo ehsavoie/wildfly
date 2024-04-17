@@ -5,5 +5,15 @@
   -->
 
 <licenseSummary>
-    <dependencies />
+    <dependencies>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <licenses>
+                <license>
+                     <name>GNU Lesser General Public License v2.1 only</name>
+                </license>
+            </licenses>
+        </dependency>
+    </dependencies>
 </licenseSummary>

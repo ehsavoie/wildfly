@@ -4,7 +4,9 @@
  */
 package org.wildfly.extension.ai;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MODULE;
+
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import java.util.Collection;
 import java.util.List;
 import org.jboss.as.controller.AttributeDefinition;
@@ -14,10 +16,9 @@ import org.jboss.as.controller.ResourceRegistration;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.capability.RuntimeCapability;
-import org.jboss.as.controller.client.helpers.MeasurementUnit;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
-import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.wildfly.extension.ai.embeddings.EmbeddingModelProviderServiceConfigurator;
 import org.wildfly.service.descriptor.UnaryServiceDescriptor;
 import org.wildfly.subsystem.resource.ChildResourceDefinitionRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
@@ -25,35 +26,31 @@ import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
 import org.wildfly.subsystem.resource.ResourceDescriptor;
 import org.wildfly.subsystem.resource.operation.ResourceOperationRuntimeHandler;
 
-public class ChatLanguageModelProviderRegistrar implements ChildResourceDefinitionRegistrar {
+public class EmbeddingModelProviderRegistrar implements ChildResourceDefinitionRegistrar {
 
-    static final UnaryServiceDescriptor<ChatLanguageModel> CHAT_MODEL_PROVIDER_DESCRIPTOR = UnaryServiceDescriptor.of("org.wildfly.ai.chatmodel", ChatLanguageModel.class);
-    public static final RuntimeCapability<Void> CHAT_MODEL_PROVIDER_CAPABILITY = RuntimeCapability.Builder.of(CHAT_MODEL_PROVIDER_DESCRIPTOR).setAllowMultipleRegistrations(true).build();
+    static final UnaryServiceDescriptor<EmbeddingModel> EMBEDDING_MODEL_PROVIDER_DESCRIPTOR = UnaryServiceDescriptor.of("org.wildfly.ai.embedding", EmbeddingModel.class);
+    public static final RuntimeCapability<Void> EMBEDDING_MODEL_PROVIDER_CAPABILITY = RuntimeCapability.Builder.of(EMBEDDING_MODEL_PROVIDER_DESCRIPTOR).setAllowMultipleRegistrations(true).build();
 
-    public static final SimpleAttributeDefinition BASE_URL = new SimpleAttributeDefinitionBuilder("base-url", ModelType.STRING, false).setAllowExpression(true).build();
-    public static final SimpleAttributeDefinition CONNECT_TIMEOUT = new SimpleAttributeDefinitionBuilder("connect-timeout", ModelType.LONG, true)
+    public static final SimpleAttributeDefinition EMBEDDING_MODULE = new SimpleAttributeDefinitionBuilder(MODULE, ModelType.STRING, false)
             .setAllowExpression(true)
-            .setDefaultValue(ModelNode.ZERO)
-            .setMeasurementUnit(MeasurementUnit.MILLISECONDS)
             .build();
-    public static final SimpleAttributeDefinition TEMPERATURE = new SimpleAttributeDefinitionBuilder("temperature", ModelType.DOUBLE, true)
+    public static final SimpleAttributeDefinition EMBEDDING_MODEL_CLASS = new SimpleAttributeDefinitionBuilder("embedding-class", ModelType.STRING, false)
             .setAllowExpression(true)
-            .setDefaultValue(ModelNode.ZERO)
             .build();
 
-    static final Collection<AttributeDefinition> ATTRIBUTES = List.of(BASE_URL,CONNECT_TIMEOUT,TEMPERATURE);
+    static final Collection<AttributeDefinition> ATTRIBUTES = List.of(EMBEDDING_MODULE, EMBEDDING_MODEL_CLASS);
 
     private final ResourceRegistration registration;
     private final ResourceDescriptor descriptor;
-    static final String NAME = "chat-model";
+    static final String NAME = "embedding-model";
     static final PathElement PATH = PathElement.pathElement(NAME);
 
-    ChatLanguageModelProviderRegistrar() {
+    EmbeddingModelProviderRegistrar() {
         this.registration = ResourceRegistration.of(PATH);
-        this.descriptor =  ResourceDescriptor.builder(AISubsystemRegistrar.RESOLVER.createChildResolver(PATH))
-                .addCapability(CHAT_MODEL_PROVIDER_CAPABILITY)
+        this.descriptor = ResourceDescriptor.builder(AISubsystemRegistrar.RESOLVER.createChildResolver(PATH))
+                .addCapability(EMBEDDING_MODEL_PROVIDER_CAPABILITY)
                 .addAttributes(ATTRIBUTES)
-                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new ChatModelProviderServiceConfigurator()))
+                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new EmbeddingModelProviderServiceConfigurator()))
                 .build();
     }
 
@@ -64,4 +61,5 @@ public class ChatLanguageModelProviderRegistrar implements ChildResourceDefiniti
         ManagementResourceRegistrar.of(this.descriptor).register(subsystemRegistration);
         return subsystemRegistration;
     }
+
 }
