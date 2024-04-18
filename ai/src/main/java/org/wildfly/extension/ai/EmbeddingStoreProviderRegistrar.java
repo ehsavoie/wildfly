@@ -6,6 +6,10 @@ package org.wildfly.extension.ai;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MODULE;
 
+import org.wildfly.extension.ai.embeddings.EmbeddingStoreProviderServiceConfigurator;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
+
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import java.util.Collection;
 import java.util.List;
@@ -17,8 +21,8 @@ import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-import org.wildfly.extension.ai.embeddings.EmbeddingModelProviderServiceConfigurator;
 import org.wildfly.service.descriptor.UnaryServiceDescriptor;
 import org.wildfly.subsystem.resource.ChildResourceDefinitionRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
@@ -26,31 +30,32 @@ import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
 import org.wildfly.subsystem.resource.ResourceDescriptor;
 import org.wildfly.subsystem.resource.operation.ResourceOperationRuntimeHandler;
 
-public class EmbeddingModelProviderRegistrar implements ChildResourceDefinitionRegistrar {
+public class EmbeddingStoreProviderRegistrar implements ChildResourceDefinitionRegistrar {
 
-    static final UnaryServiceDescriptor<EmbeddingModel> EMBEDDING_MODEL_PROVIDER_DESCRIPTOR = UnaryServiceDescriptor.of("org.wildfly.ai.embedding.model", EmbeddingModel.class);
-    public static final RuntimeCapability<Void> EMBEDDING_MODEL_PROVIDER_CAPABILITY = RuntimeCapability.Builder.of(EMBEDDING_MODEL_PROVIDER_DESCRIPTOR).setAllowMultipleRegistrations(true).build();
+    static final UnaryServiceDescriptor<EmbeddingModel> EMBEDDING_STORE_PROVIDER_DESCRIPTOR = UnaryServiceDescriptor.of("org.wildfly.ai.embedding.store", EmbeddingModel.class);
+    public static final RuntimeCapability<Void> EMBEDDING_STORE_PROVIDER_CAPABILITY = RuntimeCapability.Builder.of(EMBEDDING_STORE_PROVIDER_DESCRIPTOR).setAllowMultipleRegistrations(true).build();
 
-    public static final SimpleAttributeDefinition EMBEDDING_MODULE = new SimpleAttributeDefinitionBuilder(MODULE, ModelType.STRING, false)
+    public static final SimpleAttributeDefinition STORE_TYPE = new SimpleAttributeDefinitionBuilder(TYPE, ModelType.STRING, false)
+            .setAllowedValues("in-memory")
             .setAllowExpression(true)
             .build();
-    public static final SimpleAttributeDefinition EMBEDDING_MODEL_CLASS = new SimpleAttributeDefinitionBuilder("embedding-class", ModelType.STRING, false)
+    public static final SimpleAttributeDefinition EMBEDDING_MODULE = new SimpleAttributeDefinitionBuilder(MODULE, ModelType.STRING, true)
+            .setDefaultValue(new ModelNode("dev.langchain4j"))
             .setAllowExpression(true)
             .build();
-
-    static final Collection<AttributeDefinition> ATTRIBUTES = List.of(EMBEDDING_MODULE, EMBEDDING_MODEL_CLASS);
+    static final Collection<AttributeDefinition> ATTRIBUTES = List.of(STORE_TYPE, EMBEDDING_MODULE);
 
     private final ResourceRegistration registration;
     private final ResourceDescriptor descriptor;
-    static final String NAME = "embedding-model";
+    static final String NAME = "embedding-store";
     static final PathElement PATH = PathElement.pathElement(NAME);
 
-    EmbeddingModelProviderRegistrar() {
+    EmbeddingStoreProviderRegistrar() {
         this.registration = ResourceRegistration.of(PATH);
         this.descriptor = ResourceDescriptor.builder(AISubsystemRegistrar.RESOLVER.createChildResolver(PATH))
-                .addCapability(EMBEDDING_MODEL_PROVIDER_CAPABILITY)
+                .addCapability(EMBEDDING_STORE_PROVIDER_CAPABILITY)
                 .addAttributes(ATTRIBUTES)
-                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new EmbeddingModelProviderServiceConfigurator()))
+                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new EmbeddingStoreProviderServiceConfigurator()))
                 .build();
     }
 

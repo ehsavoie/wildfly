@@ -423,7 +423,7 @@
         <version.commons-compress>1.26.1</version.commons-compress>
         <version.de.dentrassi.crypto>2.2.2</version.de.dentrassi.crypto>
         <version.dev.ai4j.openai4j>0.17.0</version.dev.ai4j.openai4j>
-        <version.dev.langchain4j>0.29.1</version.dev.langchain4j>
+        <version.dev.langchain4j>0.30.0</version.dev.langchain4j>
         <version.gnu.getopt>1.0.13</version.gnu.getopt>
         <version.io.agroal>2.0</version.io.agroal>
         <version.io.grpc>1.58.0</version.io.grpc>

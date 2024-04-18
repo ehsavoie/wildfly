@@ -34,6 +34,7 @@ class AISubsystemRegistrar implements SubsystemResourceDefinitionRegistrar {
         ManagementResourceRegistrar.of(descriptor).register(registration);
         new ChatLanguageModelProviderRegistrar().register(registration, context);
         new EmbeddingModelProviderRegistrar().register(registration, context);
+        new EmbeddingStoreProviderRegistrar().register(registration, context);
         return registration;
     }
 }
