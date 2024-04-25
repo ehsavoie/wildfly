@@ -57,6 +57,9 @@ public class ChatLanguageModelDeploymentProcessor implements DeploymentUnitProce
                 if (annotation.target().kind() == AnnotationTarget.Kind.FIELD) {
                     FieldInfo field = annotation.target().asField();
                     if (field.type().kind() == Type.Kind.CLASS) {
+                        if(field.toString().startsWith("dev.langchain4j.model.chat.ChatLanguageModel")) {
+                             ROOT_LOGGER.warn("We need the ChatLanguageModel in the class " + field.declaringClass());
+                        }
                         String chatLanguageModelName = annotation.value().asString();
                         ROOT_LOGGER.warn("We need the ChatLanguageModel called " + chatLanguageModelName);
                         requiredChatModels.add(chatLanguageModelName);

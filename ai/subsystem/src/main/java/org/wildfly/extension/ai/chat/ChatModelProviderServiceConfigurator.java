@@ -9,7 +9,6 @@ import static org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar.C
 import static org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar.CONNECT_TIMEOUT;
 import static org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar.TEMPERATURE;
 
-import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import java.time.Duration;
@@ -52,7 +51,6 @@ private ServiceValueRegistry<ChatLanguageModel> chatModelRegistry;
                         .logResponses(Boolean.TRUE)
                         .maxTokens(1000)
                         .build();
-                model.generate(new UserMessage("Generate me a haiku please"));
                 return model;
             }
         };

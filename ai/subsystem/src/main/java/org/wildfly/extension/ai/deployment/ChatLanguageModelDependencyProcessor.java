@@ -21,12 +21,14 @@ import org.jboss.modules.ModuleLoader;
 public class ChatLanguageModelDependencyProcessor implements DeploymentUnitProcessor {
 
     public static final String[] MODULES = {
-        "dev.langchain4j.openai"
+        "dev.langchain4j.openai",
+        "dev.langchain4j.embeddings.all-minilm-l6-v2"
     };
 
     public static final String[] EXPORTED_MODULES = {
         "dev.langchain4j",
         "org.wildfly.extension.ai.injection",
+        "io.smallrye.common.annotation"
     };
 
     @Override

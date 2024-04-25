@@ -2,7 +2,6 @@
  * Copyright The WildFly Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package org.wildfly.extension.ai;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -15,6 +14,7 @@ import org.jboss.as.controller.descriptions.SubsystemResourceDescriptionResolver
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.server.deployment.Phase;
 import org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar;
+import org.wildfly.extension.ai.deployment.ChatLanguageModelDependencyProcessor;
 import org.wildfly.extension.ai.deployment.ChatLanguageModelDeploymentProcessor;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
@@ -39,7 +39,10 @@ class AISubsystemRegistrar implements SubsystemResourceDefinitionRegistrar {
         ManagementResourceRegistration registration = parent.registerSubsystemModel(ResourceDefinition.builder(ResourceRegistration.of(PATH), RESOLVER).build());
         ResourceDescriptor descriptor = ResourceDescriptor
                 .builder(RESOLVER)
-                .withDeploymentChainContributor(target -> target.addDeploymentProcessor(NAME, Phase.POST_MODULE, Phase.POST_MODULE_MICROPROFILE_OPENTRACING, new ChatLanguageModelDeploymentProcessor()))
+                .withDeploymentChainContributor(target -> {
+                    target.addDeploymentProcessor(NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_MICROPROFILE_OPENTRACING, new ChatLanguageModelDependencyProcessor());
+                    target.addDeploymentProcessor(NAME, Phase.POST_MODULE, Phase.POST_MODULE_MICROPROFILE_OPENTRACING, new ChatLanguageModelDeploymentProcessor());
+                })
                 .build();
         ManagementResourceRegistrar.of(descriptor).register(registration);
         new ChatLanguageModelProviderRegistrar(RESOLVER, chatModelRegistry).register(registration, context);
