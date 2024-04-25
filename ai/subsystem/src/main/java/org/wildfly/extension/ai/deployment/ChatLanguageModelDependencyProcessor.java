@@ -26,8 +26,7 @@ public class ChatLanguageModelDependencyProcessor implements DeploymentUnitProce
 
     public static final String[] EXPORTED_MODULES = {
         "dev.langchain4j",
-        "org.wildfly.extension.ai",
-        "io.opentracing.contrib.opentracing-interceptors"
+        "org.wildfly.extension.ai.injection",
     };
 
     @Override

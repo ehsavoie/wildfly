@@ -690,7 +690,18 @@
 
         <dependency>
             <groupId>${full.maven.groupId}</groupId>
-            <artifactId>wildfly-ai</artifactId>
+            <artifactId>wildfly-ai-injection</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>${full.maven.groupId}</groupId>
+            <artifactId>wildfly-ai-subsystem</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>

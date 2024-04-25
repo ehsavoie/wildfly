@@ -27,7 +27,7 @@ import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.Type;
 import org.jboss.msc.service.ServiceBuilder;
-import org.wildfly.extension.ai.AiCDIExtension;
+import org.wildfly.extension.ai.injection.AiCDIExtension;
 
 /**
  *
@@ -70,6 +70,8 @@ public class ChatLanguageModelDeploymentProcessor implements DeploymentUnitProce
                             (ChatLanguageModel) builder.requires(CHAT_MODEL_PROVIDER_CAPABILITY.getCapabilityServiceName(chatLanguageModelName)).get());
                 }
                 builder.install();
+                support.getOptionalCapabilityRuntimeAPI(WELD_CAPABILITY_NAME, WeldCapability.class).get()
+                    .registerExtensionInstance(new AiCDIExtension(), deploymentUnit);
             }
         } catch (CapabilityServiceSupport.NoSuchCapabilityException e) {
         }
