@@ -2,7 +2,7 @@
  * Copyright The WildFly Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.wildfly.extension.ai;
+package org.wildfly.extension.ai.chat;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import java.util.Collection;
@@ -15,15 +15,18 @@ import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
+import org.jboss.as.controller.descriptions.ParentResourceDescriptionResolver;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.wildfly.extension.ai.ChatModelProviderServiceConfigurator;
 import org.wildfly.service.descriptor.UnaryServiceDescriptor;
 import org.wildfly.subsystem.resource.ChildResourceDefinitionRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
 import org.wildfly.subsystem.resource.ResourceDescriptor;
 import org.wildfly.subsystem.resource.operation.ResourceOperationRuntimeHandler;
+import org.wildfly.subsystem.service.capture.ServiceValueRegistry;
 
 public class ChatLanguageModelProviderRegistrar implements ChildResourceDefinitionRegistrar {
 
@@ -41,19 +44,19 @@ public class ChatLanguageModelProviderRegistrar implements ChildResourceDefiniti
             .setDefaultValue(ModelNode.ZERO)
             .build();
 
-    static final Collection<AttributeDefinition> ATTRIBUTES = List.of(BASE_URL,CONNECT_TIMEOUT,TEMPERATURE);
+    public static final Collection<AttributeDefinition> ATTRIBUTES = List.of(BASE_URL,CONNECT_TIMEOUT,TEMPERATURE);
 
     private final ResourceRegistration registration;
     private final ResourceDescriptor descriptor;
     static final String NAME = "chat-model";
-    static final PathElement PATH = PathElement.pathElement(NAME);
+    public static final PathElement PATH = PathElement.pathElement(NAME);
 
-    ChatLanguageModelProviderRegistrar() {
+    public ChatLanguageModelProviderRegistrar(ParentResourceDescriptionResolver parentResolver, ServiceValueRegistry<ChatLanguageModel> chatModelRegistry) {
         this.registration = ResourceRegistration.of(PATH);
-        this.descriptor =  ResourceDescriptor.builder(AISubsystemRegistrar.RESOLVER.createChildResolver(PATH))
+        this.descriptor =  ResourceDescriptor.builder(parentResolver.createChildResolver(PATH))
                 .addCapability(CHAT_MODEL_PROVIDER_CAPABILITY)
                 .addAttributes(ATTRIBUTES)
-                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new ChatModelProviderServiceConfigurator()))
+                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new ChatModelProviderServiceConfigurator(chatModelRegistry)))
                 .build();
     }
 

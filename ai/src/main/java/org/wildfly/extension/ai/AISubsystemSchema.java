@@ -5,6 +5,7 @@
 
 package org.wildfly.extension.ai;
 
+import org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar;
 import org.jboss.as.controller.PersistentResourceXMLDescription;
 import org.jboss.as.controller.PersistentSubsystemSchema;
 import org.jboss.as.controller.SubsystemSchema;

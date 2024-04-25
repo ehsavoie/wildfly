@@ -47,6 +47,29 @@
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-core</artifactId>
         </dependency>
+        <!-- CDI -->
+        <dependency>
+            <groupId>io.smallrye.common</groupId>
+            <artifactId>smallrye-common-annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-weld-common</artifactId>
+        </dependency>
+        <!-- CDI -->
+
         <!-- required for embeddings -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
@@ -79,6 +102,12 @@
             <artifactId>langchain4j-open-ai</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
@@ -87,7 +116,6 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
