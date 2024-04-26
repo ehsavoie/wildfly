@@ -2,11 +2,11 @@
  * Copyright The WildFly Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.wildfly.extension.ai;
+package org.wildfly.extension.ai.chat;
 
+import static org.wildfly.extension.ai.Capabilities.CHAT_MODEL_PROVIDER_CAPABILITY;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.API_KEY;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.BASE_URL;
-import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.CHAT_MODEL_PROVIDER_CAPABILITY;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.CONNECT_TIMEOUT;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.MAX_TOKEN;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.TEMPERATURE;

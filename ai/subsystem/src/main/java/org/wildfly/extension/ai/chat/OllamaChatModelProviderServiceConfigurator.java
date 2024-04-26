@@ -6,8 +6,8 @@ package org.wildfly.extension.ai.chat;
 
 
 
+import static org.wildfly.extension.ai.Capabilities.CHAT_MODEL_PROVIDER_CAPABILITY;
 import static org.wildfly.extension.ai.chat.OllamaChatLanguageModelProviderRegistrar.BASE_URL;
-import static org.wildfly.extension.ai.chat.OllamaChatLanguageModelProviderRegistrar.CHAT_MODEL_PROVIDER_CAPABILITY;
 import static org.wildfly.extension.ai.chat.OllamaChatLanguageModelProviderRegistrar.MODEL_NAME;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.CONNECT_TIMEOUT;
 import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.TEMPERATURE;

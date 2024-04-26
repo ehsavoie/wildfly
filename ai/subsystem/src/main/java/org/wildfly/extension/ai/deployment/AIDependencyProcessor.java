@@ -18,7 +18,7 @@ import org.jboss.modules.ModuleLoader;
  *
  * @author Emmanuel Hugonnet (c) 2024 Red Hat, Inc.
  */
-public class ChatLanguageModelDependencyProcessor implements DeploymentUnitProcessor {
+public class AIDependencyProcessor implements DeploymentUnitProcessor {
 
     public static final String[] OPTIONAL_MODULES = {
         "dev.langchain4j.openai",

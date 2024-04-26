@@ -4,7 +4,7 @@
  */
 package org.wildfly.extension.ai.embeddings;
 
-import static org.wildfly.extension.ai.embeddings.InMemoryEmbeddingStoreProviderRegistrar.EMBEDDING_STORE_PROVIDER_CAPABILITY;
+import static org.wildfly.extension.ai.Capabilities.EMBEDDING_STORE_PROVIDER_CAPABILITY;
 import static org.wildfly.extension.ai.embeddings.InMemoryEmbeddingStoreProviderRegistrar.STORE_FILE;
 
 import dev.langchain4j.data.segment.TextSegment;
@@ -32,7 +32,7 @@ class InMemoryEmbeddingStoreProviderServiceConfigurator implements ResourceServi
                     return InMemoryEmbeddingStore.fromFile(storeFile);
             }
         };
-        return CapabilityServiceInstaller.builder(EMBEDDING_STORE_PROVIDER_CAPABILITY, factory).asActive().build();
+        return CapabilityServiceInstaller.builder(EMBEDDING_STORE_PROVIDER_CAPABILITY, factory).async().asActive().build();
     }
 
 }

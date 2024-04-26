@@ -14,10 +14,11 @@ import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.server.deployment.Phase;
 import org.wildfly.extension.ai.chat.OllamaChatLanguageModelProviderRegistrar;
 import org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar;
-import org.wildfly.extension.ai.deployment.ChatLanguageModelDependencyProcessor;
-import org.wildfly.extension.ai.deployment.ChatLanguageModelDeploymentProcessor;
+import org.wildfly.extension.ai.deployment.AIDependencyProcessor;
+import org.wildfly.extension.ai.deployment.AIDeploymentProcessor;
 import org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar;
 import org.wildfly.extension.ai.embeddings.InMemoryEmbeddingStoreProviderRegistrar;
+import org.wildfly.extension.ai.embeddings.OllamaEmbeddingModelProviderRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
 import org.wildfly.subsystem.resource.ResourceDescriptor;
@@ -39,14 +40,15 @@ class AISubsystemRegistrar implements SubsystemResourceDefinitionRegistrar {
         ResourceDescriptor descriptor = ResourceDescriptor
                 .builder(RESOLVER)
                 .withDeploymentChainContributor(target -> {
-                    target.addDeploymentProcessor(NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_MICROPROFILE_OPENTRACING, new ChatLanguageModelDependencyProcessor());
-                    target.addDeploymentProcessor(NAME, Phase.POST_MODULE, Phase.POST_MODULE_MICROPROFILE_OPENTRACING, new ChatLanguageModelDeploymentProcessor());
+                    target.addDeploymentProcessor(NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_MICROPROFILE_OPENTRACING, new AIDependencyProcessor());
+                    target.addDeploymentProcessor(NAME, Phase.POST_MODULE, Phase.POST_MODULE_MICROPROFILE_OPENTRACING, new AIDeploymentProcessor());
                 })
                 .build();
         ManagementResourceRegistrar.of(descriptor).register(registration);
         new OpenAIChatLanguageModelProviderRegistrar(RESOLVER).register(registration, context);
         new OllamaChatLanguageModelProviderRegistrar(RESOLVER).register(registration, context);
         new EmbeddingModelProviderRegistrar(RESOLVER).register(registration, context);
+        new OllamaEmbeddingModelProviderRegistrar(RESOLVER).register(registration, context);
         new InMemoryEmbeddingStoreProviderRegistrar(RESOLVER).register(registration, context);
         return registration;
     }

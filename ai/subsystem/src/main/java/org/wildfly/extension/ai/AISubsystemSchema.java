@@ -11,6 +11,10 @@ import org.jboss.as.controller.PersistentSubsystemSchema;
 import org.jboss.as.controller.SubsystemSchema;
 import org.jboss.as.controller.xml.VersionedNamespace;
 import org.jboss.staxmapper.IntVersion;
+import org.wildfly.extension.ai.chat.OllamaChatLanguageModelProviderRegistrar;
+import org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar;
+import org.wildfly.extension.ai.embeddings.InMemoryEmbeddingStoreProviderRegistrar;
+import org.wildfly.extension.ai.embeddings.OllamaEmbeddingModelProviderRegistrar;
 
 /**
  * Enumeration of AI subsystem schema versions.
@@ -36,6 +40,10 @@ enum AISubsystemSchema implements PersistentSubsystemSchema<AISubsystemSchema> {
         PersistentResourceXMLDescription.Factory factory = PersistentResourceXMLDescription.factory(this);
         return factory.builder(AISubsystemRegistrar.PATH)
                 .addChild(factory.builder(OpenAIChatLanguageModelProviderRegistrar.PATH).addAttributes(OpenAIChatLanguageModelProviderRegistrar.ATTRIBUTES.stream()).build())
+                .addChild(factory.builder(OllamaChatLanguageModelProviderRegistrar.PATH).addAttributes(OllamaChatLanguageModelProviderRegistrar.ATTRIBUTES.stream()).build())
+                .addChild(factory.builder(OllamaEmbeddingModelProviderRegistrar.PATH).addAttributes(OllamaEmbeddingModelProviderRegistrar.ATTRIBUTES.stream()).build())
+                .addChild(factory.builder(EmbeddingModelProviderRegistrar.PATH).addAttributes(EmbeddingModelProviderRegistrar.ATTRIBUTES.stream()).build())
+                .addChild(factory.builder(InMemoryEmbeddingStoreProviderRegistrar.PATH).addAttributes(InMemoryEmbeddingStoreProviderRegistrar.ATTRIBUTES.stream()).build())
                 .build();
     }
 }

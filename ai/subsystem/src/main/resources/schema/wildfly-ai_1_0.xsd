@@ -34,10 +34,31 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="ollama-chat-model" type="ollamaChatModelType">
+                <xs:annotation>
+                    <xs:documentation>
+                        A chat model provider element.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="embedding-model" type="embeddingModelType">
                 <xs:annotation>
                     <xs:documentation>
                         An embedding-model provider definition element.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ollama-embedding-model" type="embeddingModelType">
+                <xs:annotation>
+                    <xs:documentation>
+                        An embedding-model provider definition element.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="in-memory-embedding-store" type="inMemoryEmbeddingStoreType">
+                <xs:annotation>
+                    <xs:documentation>
+                        An in-memory embedding-store provider definition element.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -137,13 +158,49 @@
         </xs:attribute>
     </xs:complexType>
 
+
+    <xs:complexType name="ollamaEmbeddingModelType">
+        <xs:annotation>
+            <xs:documentation>
+                A provider of Ollama embedding model.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of this provider.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="base-url" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The base url to the chat model endpoint
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="connect-timeout" type="xs:long" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The connection timeout of the chat model
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="model-name" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The model used on Ollama.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
     <xs:complexType name="embeddingModelType">
         <xs:annotation>
             <xs:documentation>
                 A provider of embedding model.
             </xs:documentation>
         </xs:annotation>
-        
         <xs:attribute name="name" type="xs:string" use="required">
             <xs:annotation>
                 <xs:documentation>
@@ -166,4 +223,28 @@
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
+
+
+    <xs:complexType name="inMemoryEmbeddingStoreType">
+        <xs:annotation>
+            <xs:documentation>
+                A provider of in-memory embedding store.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of this provider.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="file" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The module to load the embedding model from.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    
 </xs:schema>

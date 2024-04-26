@@ -4,8 +4,9 @@
  */
 package org.wildfly.extension.ai.embeddings;
 
+import static org.wildfly.extension.ai.Capabilities.EMBEDDING_MODEL_PROVIDER_CAPABILITY;
 import static org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar.EMBEDDING_MODEL_CLASS;
-import static org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar.EMBEDDING_MODEL_PROVIDER_CAPABILITY;
+
 import static org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar.EMBEDDING_MODULE;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -33,15 +34,15 @@ public class EmbeddingModelProviderServiceConfigurator implements ResourceServic
                 ClassLoader tccl = Thread.currentThread().getContextClassLoader();
                 try {
                     ClassLoader moduleCL = org.jboss.modules.Module.getCallerModuleLoader().loadModule(moduleName).getClassLoader();
-                     Thread.currentThread().setContextClassLoader(moduleCL);
+                    Thread.currentThread().setContextClassLoader(moduleCL);
                     return (EmbeddingModel) EmbeddingModel.class.getClassLoader().loadClass(embeddingModelClassName).getConstructor().newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            } finally {
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                } finally {
                     Thread.currentThread().setContextClassLoader(tccl);
                 }
             }
         };
-        return CapabilityServiceInstaller.builder(EMBEDDING_MODEL_PROVIDER_CAPABILITY, factory).asActive().build();
+        return CapabilityServiceInstaller.builder(EMBEDDING_MODEL_PROVIDER_CAPABILITY, factory).async().asActive().build();
     }
 }

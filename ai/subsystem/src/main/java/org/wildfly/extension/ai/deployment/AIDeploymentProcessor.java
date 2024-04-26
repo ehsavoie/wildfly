@@ -6,9 +6,9 @@ package org.wildfly.extension.ai.deployment;
 
 import static org.jboss.as.weld.Capabilities.WELD_CAPABILITY_NAME;
 import static org.wildfly.extension.ai.AILogger.ROOT_LOGGER;
-import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.CHAT_MODEL_PROVIDER_CAPABILITY;
-import static org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar.EMBEDDING_MODEL_PROVIDER_CAPABILITY;
-import static org.wildfly.extension.ai.embeddings.InMemoryEmbeddingStoreProviderRegistrar.EMBEDDING_STORE_PROVIDER_CAPABILITY;
+import static org.wildfly.extension.ai.Capabilities.CHAT_MODEL_PROVIDER_CAPABILITY;
+import static org.wildfly.extension.ai.Capabilities.EMBEDDING_MODEL_PROVIDER_CAPABILITY;
+import static org.wildfly.extension.ai.Capabilities.EMBEDDING_STORE_PROVIDER_CAPABILITY;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -37,7 +37,7 @@ import org.wildfly.extension.ai.injection.AiCDIExtension;
  *
  * @author Emmanuel Hugonnet (c) 2024 Red Hat, Inc.
  */
-public class ChatLanguageModelDeploymentProcessor implements DeploymentUnitProcessor {
+public class AIDeploymentProcessor implements DeploymentUnitProcessor {
 
     @Override
     public void deploy(DeploymentPhaseContext deploymentPhaseContext) throws DeploymentUnitProcessingException {

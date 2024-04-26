@@ -5,8 +5,8 @@
 package org.wildfly.extension.ai.embeddings;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.FILE;
+import static org.wildfly.extension.ai.Capabilities.EMBEDDING_STORE_PROVIDER_CAPABILITY;
 
-import dev.langchain4j.model.embedding.EmbeddingModel;
 import java.util.Collection;
 import java.util.List;
 import org.jboss.as.controller.AttributeDefinition;
@@ -15,11 +15,9 @@ import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.ResourceRegistration;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.as.controller.descriptions.ParentResourceDescriptionResolver;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelType;
-import org.wildfly.service.descriptor.UnaryServiceDescriptor;
 import org.wildfly.subsystem.resource.ChildResourceDefinitionRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
@@ -28,19 +26,16 @@ import org.wildfly.subsystem.resource.operation.ResourceOperationRuntimeHandler;
 
 public class InMemoryEmbeddingStoreProviderRegistrar implements ChildResourceDefinitionRegistrar {
 
-    static final UnaryServiceDescriptor<EmbeddingModel> EMBEDDING_STORE_PROVIDER_DESCRIPTOR = UnaryServiceDescriptor.of("org.wildfly.ai.embedding.store", EmbeddingModel.class);
-    public static final RuntimeCapability<Void> EMBEDDING_STORE_PROVIDER_CAPABILITY = RuntimeCapability.Builder.of(EMBEDDING_STORE_PROVIDER_DESCRIPTOR).setAllowMultipleRegistrations(true).build();
-
     public static final SimpleAttributeDefinition STORE_FILE = new SimpleAttributeDefinitionBuilder(FILE, ModelType.STRING, false)
             .setAllowExpression(true)
             .build();
 
-    static final Collection<AttributeDefinition> ATTRIBUTES = List.of(STORE_FILE);
+    public static final Collection<AttributeDefinition> ATTRIBUTES = List.of(STORE_FILE);
 
     private final ResourceRegistration registration;
     private final ResourceDescriptor descriptor;
     static final String NAME = "in-memory-embedding-store";
-    static final PathElement PATH = PathElement.pathElement(NAME);
+    public static final PathElement PATH = PathElement.pathElement(NAME);
 
     public InMemoryEmbeddingStoreProviderRegistrar(ParentResourceDescriptionResolver parentResolver) {
         this.registration = ResourceRegistration.of(PATH);
