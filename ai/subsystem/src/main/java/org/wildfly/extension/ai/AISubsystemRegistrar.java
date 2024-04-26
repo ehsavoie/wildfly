@@ -16,6 +16,8 @@ import org.wildfly.extension.ai.chat.OllamaChatLanguageModelProviderRegistrar;
 import org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar;
 import org.wildfly.extension.ai.deployment.ChatLanguageModelDependencyProcessor;
 import org.wildfly.extension.ai.deployment.ChatLanguageModelDeploymentProcessor;
+import org.wildfly.extension.ai.embeddings.EmbeddingModelProviderRegistrar;
+import org.wildfly.extension.ai.embeddings.InMemoryEmbeddingStoreProviderRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
 import org.wildfly.subsystem.resource.ResourceDescriptor;
@@ -44,8 +46,8 @@ class AISubsystemRegistrar implements SubsystemResourceDefinitionRegistrar {
         ManagementResourceRegistrar.of(descriptor).register(registration);
         new OpenAIChatLanguageModelProviderRegistrar(RESOLVER).register(registration, context);
         new OllamaChatLanguageModelProviderRegistrar(RESOLVER).register(registration, context);
-        new EmbeddingModelProviderRegistrar().register(registration, context);
-        new EmbeddingStoreProviderRegistrar().register(registration, context);
+        new EmbeddingModelProviderRegistrar(RESOLVER).register(registration, context);
+        new InMemoryEmbeddingStoreProviderRegistrar(RESOLVER).register(registration, context);
         return registration;
     }
 }
