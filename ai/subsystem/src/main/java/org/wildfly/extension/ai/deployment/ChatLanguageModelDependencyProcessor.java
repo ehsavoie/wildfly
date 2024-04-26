@@ -22,8 +22,7 @@ public class ChatLanguageModelDependencyProcessor implements DeploymentUnitProce
 
     public static final String[] OPTIONAL_MODULES = {
         "dev.langchain4j.openai",
-        "dev.langchain4j.ollama",
-        "dev.langchain4j.embeddings.all-minilm-l6-v2"
+        "dev.langchain4j.ollama"
     };
 
     public static final String[] EXPORTED_MODULES = {
