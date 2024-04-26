@@ -20,8 +20,9 @@ import org.jboss.modules.ModuleLoader;
  */
 public class ChatLanguageModelDependencyProcessor implements DeploymentUnitProcessor {
 
-    public static final String[] MODULES = {
+    public static final String[] OPTIONAL_MODULES = {
         "dev.langchain4j.openai",
+        "dev.langchain4j.ollama",
         "dev.langchain4j.embeddings.all-minilm-l6-v2"
     };
 
@@ -36,8 +37,8 @@ public class ChatLanguageModelDependencyProcessor implements DeploymentUnitProce
         DeploymentUnit deploymentUnit = deploymentPhaseContext.getDeploymentUnit();
         ModuleSpecification moduleSpecification = deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
         ModuleLoader moduleLoader = Module.getBootModuleLoader();
-        for (String module : MODULES) {
-            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, false, false, true, false));
+        for (String module : OPTIONAL_MODULES) {
+            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, module, true, false, true, false));
         }
         for (String module : EXPORTED_MODULES) {
             ModuleDependency modDep = new ModuleDependency(moduleLoader, module, false, true, true, false);

@@ -4,5 +4,5 @@
   -->
 
 <subsystem xmlns="urn:jboss:domain:ai:1.0">
-    <chat-model name="chat" base-url="http://langchain4j.dev/demo/openai/v1"/>
+    <openai-chat-model name="chat" base-url="http://langchain4j.dev/demo/openai/v1" api-key="demo"/>
 </subsystem>

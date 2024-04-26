@@ -17,54 +17,64 @@ import org.jboss.as.controller.capability.RuntimeCapability;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
 import org.jboss.as.controller.descriptions.ParentResourceDescriptionResolver;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.as.controller.registry.RuntimePackageDependency;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-import org.wildfly.extension.ai.ChatModelProviderServiceConfigurator;
+import org.wildfly.extension.ai.OpenAIChatModelProviderServiceConfigurator;
 import org.wildfly.service.descriptor.UnaryServiceDescriptor;
 import org.wildfly.subsystem.resource.ChildResourceDefinitionRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrar;
 import org.wildfly.subsystem.resource.ManagementResourceRegistrationContext;
 import org.wildfly.subsystem.resource.ResourceDescriptor;
 import org.wildfly.subsystem.resource.operation.ResourceOperationRuntimeHandler;
-import org.wildfly.subsystem.service.capture.ServiceValueRegistry;
 
-public class ChatLanguageModelProviderRegistrar implements ChildResourceDefinitionRegistrar {
+public class OpenAIChatLanguageModelProviderRegistrar implements ChildResourceDefinitionRegistrar {
 
     static final UnaryServiceDescriptor<ChatLanguageModel> CHAT_MODEL_PROVIDER_DESCRIPTOR = UnaryServiceDescriptor.of("org.wildfly.ai.chatmodel", ChatLanguageModel.class);
     public static final RuntimeCapability<Void> CHAT_MODEL_PROVIDER_CAPABILITY = RuntimeCapability.Builder.of(CHAT_MODEL_PROVIDER_DESCRIPTOR).setAllowMultipleRegistrations(true).build();
 
-    public static final SimpleAttributeDefinition BASE_URL = new SimpleAttributeDefinitionBuilder("base-url", ModelType.STRING, false).setAllowExpression(true).build();
+    public static final SimpleAttributeDefinition API_KEY = new SimpleAttributeDefinitionBuilder("api-key", ModelType.STRING, false)
+            .setAllowExpression(true)
+            .build();
+    public static final SimpleAttributeDefinition BASE_URL = new SimpleAttributeDefinitionBuilder("base-url", ModelType.STRING, false)
+            .setAllowExpression(true)
+            .build();
     public static final SimpleAttributeDefinition CONNECT_TIMEOUT = new SimpleAttributeDefinitionBuilder("connect-timeout", ModelType.LONG, true)
             .setAllowExpression(true)
             .setDefaultValue(ModelNode.ZERO)
             .setMeasurementUnit(MeasurementUnit.MILLISECONDS)
+            .build();
+    public static final SimpleAttributeDefinition MAX_TOKEN = new SimpleAttributeDefinitionBuilder("max-token", ModelType.INT, true)
+            .setAllowExpression(true)
+            .setDefaultValue(new ModelNode(1000))
             .build();
     public static final SimpleAttributeDefinition TEMPERATURE = new SimpleAttributeDefinitionBuilder("temperature", ModelType.DOUBLE, true)
             .setAllowExpression(true)
             .setDefaultValue(ModelNode.ZERO)
             .build();
 
-    public static final Collection<AttributeDefinition> ATTRIBUTES = List.of(BASE_URL,CONNECT_TIMEOUT,TEMPERATURE);
+    public static final Collection<AttributeDefinition> ATTRIBUTES = List.of(API_KEY, BASE_URL, CONNECT_TIMEOUT, MAX_TOKEN, TEMPERATURE);
 
     private final ResourceRegistration registration;
     private final ResourceDescriptor descriptor;
-    static final String NAME = "chat-model";
+    static final String NAME = "openai-chat-model";
     public static final PathElement PATH = PathElement.pathElement(NAME);
 
-    public ChatLanguageModelProviderRegistrar(ParentResourceDescriptionResolver parentResolver, ServiceValueRegistry<ChatLanguageModel> chatModelRegistry) {
+    public OpenAIChatLanguageModelProviderRegistrar(ParentResourceDescriptionResolver parentResolver) {
         this.registration = ResourceRegistration.of(PATH);
-        this.descriptor =  ResourceDescriptor.builder(parentResolver.createChildResolver(PATH))
+        this.descriptor = ResourceDescriptor.builder(parentResolver.createChildResolver(PATH))
                 .addCapability(CHAT_MODEL_PROVIDER_CAPABILITY)
                 .addAttributes(ATTRIBUTES)
-                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new ChatModelProviderServiceConfigurator(chatModelRegistry)))
+                .withRuntimeHandler(ResourceOperationRuntimeHandler.configureService(new OpenAIChatModelProviderServiceConfigurator()))
                 .build();
     }
 
     @Override
     public ManagementResourceRegistration register(ManagementResourceRegistration parent, ManagementResourceRegistrationContext context) {
         ResourceDefinition definition = ResourceDefinition.builder(this.registration, this.descriptor.getResourceDescriptionResolver()).build();
-        ManagementResourceRegistration subsystemRegistration = parent.registerSubModel(definition);
-        ManagementResourceRegistrar.of(this.descriptor).register(subsystemRegistration);
-        return subsystemRegistration;
+        ManagementResourceRegistration resourceRegistration = parent.registerSubModel(definition);
+        resourceRegistration.registerAdditionalRuntimePackages(RuntimePackageDependency.required("dev.langchain4j.openai"));
+        ManagementResourceRegistrar.of(this.descriptor).register(resourceRegistration);
+        return resourceRegistration;
     }
 }

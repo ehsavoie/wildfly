@@ -5,7 +5,7 @@
 
 package org.wildfly.extension.ai;
 
-import org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar;
+import org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar;
 import org.jboss.as.controller.PersistentResourceXMLDescription;
 import org.jboss.as.controller.PersistentSubsystemSchema;
 import org.jboss.as.controller.SubsystemSchema;
@@ -35,7 +35,7 @@ enum AISubsystemSchema implements PersistentSubsystemSchema<AISubsystemSchema> {
     public PersistentResourceXMLDescription getXMLDescription() {
         PersistentResourceXMLDescription.Factory factory = PersistentResourceXMLDescription.factory(this);
         return factory.builder(AISubsystemRegistrar.PATH)
-                .addChild(factory.builder(ChatLanguageModelProviderRegistrar.PATH).addAttributes(ChatLanguageModelProviderRegistrar.ATTRIBUTES.stream()).build())
+                .addChild(factory.builder(OpenAIChatLanguageModelProviderRegistrar.PATH).addAttributes(OpenAIChatLanguageModelProviderRegistrar.ATTRIBUTES.stream()).build())
                 .build();
     }
 }

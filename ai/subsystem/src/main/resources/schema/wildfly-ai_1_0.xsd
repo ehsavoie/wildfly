@@ -27,7 +27,7 @@
             </xs:documentation>
         </xs:annotation>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="chat-model" type="chatModelType">
+            <xs:element name="openai-chat-model" type="openaiChatModelType">
                 <xs:annotation>
                     <xs:documentation>
                         A chat model provider element.
@@ -44,10 +44,10 @@
         </xs:choice>
     </xs:complexType>
 
-    <xs:complexType name="chatModelType">
+    <xs:complexType name="openaiChatModelType">
         <xs:annotation>
             <xs:documentation>
-                A provider of chat model.
+                A provider of an OpenAI chat model.
             </xs:documentation>
         </xs:annotation>
         <xs:attribute name="name" type="xs:string" use="required">
@@ -57,10 +57,17 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="base-url" type="xs:string" use="optional">
+        <xs:attribute name="api-key" type="xs:string">
             <xs:annotation>
                 <xs:documentation>
-                    The base uril to the chat model endpoint
+                    The key to connect to the OpenAI model.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="base-url" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The base url to the chat model endpoint
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -68,6 +75,56 @@
             <xs:annotation>
                 <xs:documentation>
                     The connection timeout of the chat model
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="max-token" type="xs:int" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The maximum number of token of the chat model
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="temperature" type="xs:double" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The temperature of the chat model
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="ollamaChatModelType">
+        <xs:annotation>
+            <xs:documentation>
+                A provider of Ollama chat model.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of this provider.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="base-url" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The base url to the chat model endpoint
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="connect-timeout" type="xs:long" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The connection timeout of the chat model
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="model-name" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The model used on Ollama.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>

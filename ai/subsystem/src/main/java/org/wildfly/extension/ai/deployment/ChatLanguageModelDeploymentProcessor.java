@@ -6,7 +6,7 @@ package org.wildfly.extension.ai.deployment;
 
 import static org.jboss.as.weld.Capabilities.WELD_CAPABILITY_NAME;
 import static org.wildfly.extension.ai.AILogger.ROOT_LOGGER;
-import static org.wildfly.extension.ai.chat.ChatLanguageModelProviderRegistrar.CHAT_MODEL_PROVIDER_CAPABILITY;
+import static org.wildfly.extension.ai.chat.OpenAIChatLanguageModelProviderRegistrar.CHAT_MODEL_PROVIDER_CAPABILITY;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import io.smallrye.common.annotation.Identifier;
