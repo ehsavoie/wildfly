@@ -29,7 +29,7 @@ class InMemoryEmbeddingStoreProviderServiceConfigurator implements ResourceServi
         Supplier<EmbeddingStore<TextSegment>> factory = new Supplier<>() {
             @Override
             public EmbeddingStore<TextSegment> get() {
-                    return InMemoryEmbeddingStore.fromFile(storeFile);
+                return InMemoryEmbeddingStore.fromFile(storeFile);
             }
         };
         return CapabilityServiceInstaller.builder(EMBEDDING_STORE_PROVIDER_CAPABILITY, factory).async().asActive().build();
