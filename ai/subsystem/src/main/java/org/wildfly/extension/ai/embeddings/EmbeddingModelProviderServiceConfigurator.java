@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
+import org.wildfly.extension.ai.AILogger;
 import org.wildfly.subsystem.service.ResourceServiceConfigurator;
 import org.wildfly.subsystem.service.ResourceServiceInstaller;
 import org.wildfly.subsystem.service.capability.CapabilityServiceInstaller;
@@ -37,6 +38,7 @@ public class EmbeddingModelProviderServiceConfigurator implements ResourceServic
                     Thread.currentThread().setContextClassLoader(moduleCL);
                     return (EmbeddingModel) EmbeddingModel.class.getClassLoader().loadClass(embeddingModelClassName).getConstructor().newInstance();
                 } catch (Exception e) {
+                    AILogger.ROOT_LOGGER.error("Coudln't load EmbeddingModel " + e.getMessage(), e);
                     throw new RuntimeException(e);
                 } finally {
                     Thread.currentThread().setContextClassLoader(tccl);
