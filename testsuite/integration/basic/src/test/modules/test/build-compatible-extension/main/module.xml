@@ -8,7 +8,7 @@
 <module xmlns="urn:jboss:module:1.9" name="test.build-compatible-extension">
 
     <resources>
-        <resource-root path="bce-extension.jar"/>
+        <resource-root path="bce-extension-bootableJar.jar"/>
         <!-- Insert resources here -->
     </resources>
 
