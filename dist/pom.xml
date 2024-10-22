@@ -123,6 +123,7 @@
                             <offline>${galleon.offline}</offline>
                             <plugin-options>
                                 <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <jboss-overridden-artifacts>org.jboss.activemq.artemis.integration:artemis-wildfly-integration:2.0.3-SNAPSHOT::jar</jboss-overridden-artifacts>
                             </plugin-options>
                             <feature-packs>
                                 <feature-pack>

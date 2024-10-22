@@ -501,6 +501,7 @@
                         <jboss-maven-dist/>
                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
                         <optional-packages>passive+</optional-packages>
+                        <jboss-overridden-artifacts>org.jboss.activemq.artemis.integration:artemis-wildfly-integration:2.0.3-SNAPSHOT::jar</jboss-overridden-artifacts>
                     </galleon-options>
                 </configuration>
                 <executions>
